@@ -33,6 +33,7 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"fp-ts": "^2.16.1"
+		"fp-ts": "^2.16.1",
+		"pocketbase": "^0.18.2"
 	}
 }

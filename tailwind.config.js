@@ -5,7 +5,15 @@ export default {
     "./src/**/*.{svelte,js,ts,jsx,tsx}",
   ],
   theme: {
-    extend: {},
+    fontFamily: {
+			display: ['Urbana'],
+			body: ['Realist']
+		},
+		extend: {
+			screens: {
+				xs: '448px'
+			}
+		}
   },
   plugins: [],
 }
