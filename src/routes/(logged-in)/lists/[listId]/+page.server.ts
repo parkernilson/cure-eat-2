@@ -1,12 +1,11 @@
 // import { getListWithItems } from '$lib/lists/lists';
-import * as TE from 'fp-ts/lib/TaskEither';
-import * as T from 'fp-ts/lib/Task';
-import { pipe } from 'fp-ts/lib/function';
-import { handleAndThrowErrors } from '$lib/utils/fp';
-import { addItemToListCurried, getListWithItemsCurried } from '$lib/lists/db';
-import { toError } from 'fp-ts/lib/Either';
-import { getStringWithKey } from '$lib/utils/fp/formData';
 import { createListItem } from '$lib/lists';
+import { addItemToListCurried, getListWithItemsCurried } from '$lib/lists/db';
+import { handleAndThrowErrors } from '$lib/utils/fp';
+import { getFormData, getStringWithKey } from '$lib/utils/fp/formData';
+import * as T from 'fp-ts/lib/Task';
+import * as TE from 'fp-ts/lib/TaskEither';
+import { pipe } from 'fp-ts/lib/function';
 
 export const load = ({ locals, params }) =>
 	pipe(
@@ -19,7 +18,7 @@ export const load = ({ locals, params }) =>
 export const actions = {
 	addItem: async ({ locals, params, request }) =>
 		pipe(
-			TE.tryCatch(() => request.formData(), toError),
+			getFormData(request),
 			TE.flatMapEither(getStringWithKey('value')),
 			TE.map(createListItem(params.listId)),
 			TE.flatMap(addItemToListCurried(locals.pb)(params.listId)),
