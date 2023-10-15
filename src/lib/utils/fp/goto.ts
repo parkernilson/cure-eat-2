@@ -1,5 +1,5 @@
 import { goto } from '$app/navigation';
-import type { Task } from 'fp-ts/Task';
+import type { Task } from 'fp-ts/lib/Task';
 
 /** Gives a task that reroutes the user to the given url */
 export const gotoTask =

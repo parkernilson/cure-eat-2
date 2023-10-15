@@ -1,5 +1,5 @@
-import * as TE from 'fp-ts/TaskEither';
-import type { TaskEither } from 'fp-ts/TaskEither';
+import * as TE from 'fp-ts/lib/TaskEither';
+import type { TaskEither } from 'fp-ts/lib/TaskEither';
 import { error as logError, log } from 'fp-ts/lib/Console';
 import { flow } from 'fp-ts/lib/function';
 
