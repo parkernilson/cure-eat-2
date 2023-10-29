@@ -6,6 +6,8 @@
 		"dev": "./pocketbase serve & vite dev",
 		"build": "vite build",
 		"preview": "vite preview",
+		"test": "vitest --watch false",
+		"test:watch": "vitest --watch",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"lint": "prettier --plugin-search-dir . --check . && eslint .",
@@ -29,11 +31,14 @@
 		"tailwindcss": "^3.3.3",
 		"tslib": "^2.4.1",
 		"typescript": "^5.0.0",
-		"vite": "^4.4.2"
+		"vite": "^4.4.2",
+		"vitest": "^0.34.6",
+		"vitest-fetch-mock": "^0.2.2"
 	},
 	"type": "module",
 	"dependencies": {
 		"fp-ts": "^2.16.1",
+		"fp-ts-std": "^0.17.1",
 		"pocketbase": "^0.18.2"
 	}
 }

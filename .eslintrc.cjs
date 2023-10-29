@@ -25,6 +25,12 @@ module.exports = {
 			parserOptions: {
 				parser: '@typescript-eslint/parser'
 			}
+		},
+		{
+			files: '*.test.ts',
+			rules: {
+				'@typescript-eslint/ban-ts-comment': 0
+			}
 		}
 	]
 };

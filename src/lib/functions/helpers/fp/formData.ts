@@ -1,5 +1,6 @@
 import * as TE from 'fp-ts/lib/TaskEither'
 import * as E from 'fp-ts/lib/Either'
+import { pipe } from 'fp-ts/lib/function';
 
 export const getString = (formData: FormData, key: string) =>
 	E.fromNullable(new Error(`Form data was not a string`))(
@@ -9,3 +10,8 @@ export const getString = (formData: FormData, key: string) =>
 export const getStringWithKey = (key: string) => (formData: FormData) => getString(formData, key);
 
 export const getFormData = (request: Request) => TE.tryCatch(() => request.formData(), E.toError);
+
+export const getStringFromForm = (request: Request) => (key: string) => pipe(
+	getFormData(request),
+	TE.flatMapEither(getStringWithKey(key))
+)

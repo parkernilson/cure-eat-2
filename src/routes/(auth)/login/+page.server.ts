@@ -1,4 +1,4 @@
-import { authWithPassword } from '$lib/auth';
+import { authWithPassword } from '$lib/functions/auth';
 import { handleAndThrowErrors } from '$lib/utils/fp/errors';
 import * as T from 'fp-ts/lib/Task';
 import * as TE from 'fp-ts/lib/TaskEither';

@@ -1,5 +1,5 @@
 import * as TE from 'fp-ts/lib/TaskEither';
-import type { ListItem, ListItemModel, ListModel, ListWithItems } from '$lib/lists/db/interfaces';
+import type { ListItem, ListItemModel, ListModel, ListWithItems } from '$lib/functions/lists/db/interfaces';
 import { pipe } from 'fp-ts/lib/function';
 import type Client from 'pocketbase';
 import { toError } from 'fp-ts/lib/Either';
