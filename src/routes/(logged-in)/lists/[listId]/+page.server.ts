@@ -1,8 +1,8 @@
 // import { getListWithItems } from '$lib/lists/lists';
 import { createListItem } from '$lib/functions/lists';
-import { addItemToListCurried, getListWithItemsCurried } from '$lib/functions/lists/db';
-import { handleAndThrowErrors } from '$lib/functions/helpers/fp';
-import { getFormData, getStringWithKey } from '$lib/functions/helpers/fp/formData';
+import { addItemToListCurried, getListWithItemsCurried } from '$lib/functions/lists/db-accessors';
+import { handleAndThrowErrors } from '$lib/functions/utils/fp';
+import { getFormData, getStringWithKey } from '$lib/functions/utils/fp/form-data';
 import * as T from 'fp-ts/lib/Task';
 import * as TE from 'fp-ts/lib/TaskEither';
 import { pipe } from 'fp-ts/lib/function';

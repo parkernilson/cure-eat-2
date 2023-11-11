@@ -1,5 +1,5 @@
-import { handleRequestErrors } from '$lib/functions/errors/errors.js';
-import { getStringFromForm } from '$lib/functions/helpers/fp/formData.js';
+import { handleRequestErrors } from '$lib/functions/errors/handle-request-errors.js';
+import { getStringFromForm } from '$lib/functions/utils/fp/form-data.js';
 import { json } from '@sveltejs/kit';
 import * as TE from 'fp-ts/lib/TaskEither';
 import * as T from 'fp-ts/lib/Task';

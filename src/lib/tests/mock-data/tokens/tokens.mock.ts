@@ -1,4 +1,4 @@
-import type { AccessToken, AccessTokenRecordModel } from '$lib/interfaces/tokens';
+import type { AccessToken, AccessTokenRecordModel } from '$lib/interfaces/tokens/tokens';
 
 export const clientToken: AccessToken = {
 	access_token: 'fake JWT token',

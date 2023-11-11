@@ -1,5 +1,5 @@
 import { authWithPassword } from '$lib/functions/auth';
-import { handleAndThrowErrors } from '$lib/utils/fp/errors';
+import { unsafeUnwrap } from 'fp-ts-std/Either';
 import * as T from 'fp-ts/lib/Task';
 import * as TE from 'fp-ts/lib/TaskEither';
 import { pipe } from 'fp-ts/lib/function';
@@ -17,7 +17,7 @@ export const actions = {
 			)
 		),
 		TE.map(authResponse => authResponse.record),
-		T.map(handleAndThrowErrors)
+		T.map(unsafeUnwrap)
 	)(),
 
 };
