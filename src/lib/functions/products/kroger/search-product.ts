@@ -1,4 +1,5 @@
-import { getClientContextToken } from '$lib/functions/auth/kroger/tokens';
+import { getClientContextToken } from '$lib/functions/auth/kroger/get-client-context-token';
+import { responseToJson } from '$lib/functions/utils/fetch';
 import { toError } from 'fp-ts/lib/Either';
 import * as TE from 'fp-ts/lib/TaskEither';
 import { pipe } from 'fp-ts/lib/function';
@@ -17,5 +18,5 @@ export const searchKrogerProduct = (adminClient: Client) => (searchTerm: string)
             }),
 			toError
 		)),
-        TE.flatMap(response => TE.fromTask(() => response.json()))
+        TE.flatMap(responseToJson)
 	);

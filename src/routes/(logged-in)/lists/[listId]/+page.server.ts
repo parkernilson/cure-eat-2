@@ -1,5 +1,5 @@
 // import { getListWithItems } from '$lib/lists/lists';
-import { createListItem } from '$lib/functions/lists';
+import { createListItemObject } from '$lib/functions/lists';
 import { addItemToListCurried, getListWithItemsCurried } from '$lib/functions/lists/db-accessors';
 import { handleAndThrowErrors } from '$lib/functions/utils/fp';
 import { getFormData, getStringWithKey } from '$lib/functions/utils/fp/form-data';
@@ -20,7 +20,7 @@ export const actions = {
 		pipe(
 			getFormData(request),
 			TE.flatMapEither(getStringWithKey('value')),
-			TE.map(createListItem(params.listId)),
+			TE.map(createListItemObject(params.listId)),
 			TE.flatMap(addItemToListCurried(locals.pb)(params.listId)),
 			T.map(handleAndThrowErrors)
 		)()

@@ -1,6 +1,7 @@
 import type { ListItem, ListItemModel, ListModel, ListWithItems } from '$lib/interfaces/lists';
 import { toError } from 'fp-ts/lib/Either';
 import * as TE from 'fp-ts/lib/TaskEither';
+import * as B from 'fp-ts/lib/boolean';
 import { pipe } from 'fp-ts/lib/function';
 import type Client from 'pocketbase';
 
@@ -37,9 +38,13 @@ export const getAllLists = (pb: Client) =>
 	TE.tryCatch(() => pb.collection('lists').getFullList<ListModel>(), toError);
 
 export const addItemToList = (pb: Client, listId: string, item: ListItem) =>
-	listId === item.list
-		? TE.tryCatch(() => pb.collection('list_items').create(item), toError)
-		: TE.left(new Error(`List id ${listId} does not match item list id ${item.list}`));
+	pipe(
+		listId === item.list, 
+		B.fold(
+			() => TE.left(new Error(`List id ${listId} does not match item list id ${item.list}`)),
+			() => TE.tryCatch(() => pb.collection('list_items').create(item), toError)
+		)
+	);
 
 export const addItemToListCurried = (pb: Client) => (listId: string) => (item: ListItem) =>
 	addItemToList(pb, listId, item);

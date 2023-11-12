@@ -5,7 +5,7 @@ import * as E from 'fp-ts/lib/Either';
 import PocketBase, { ClientResponseError } from 'pocketbase';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import createFetchMock from 'vitest-fetch-mock';
-import { getClientContextToken } from '$lib/functions/auth/kroger/tokens'
+import { getClientContextToken } from '$lib/functions/auth/kroger/get-client-context-token'
 import { clientTokenRecord } from '../../../mock-data/tokens/tokens.mock';
 
 vi.mock('pocketbase', async () => {
