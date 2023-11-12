@@ -1,5 +1,6 @@
-import { authWithPassword } from '$lib/functions/auth';
-import { unsafeUnwrap } from 'fp-ts-std/Either';
+import { authWithPassword } from '$lib/functions/auth/pocketbase';
+import { throwRequestErrors } from '$lib/functions/errors';
+import { json } from '@sveltejs/kit';
 import * as T from 'fp-ts/lib/Task';
 import * as TE from 'fp-ts/lib/TaskEither';
 import { pipe } from 'fp-ts/lib/function';
@@ -17,7 +18,8 @@ export const actions = {
 			)
 		),
 		TE.map(authResponse => authResponse.record),
-		T.map(unsafeUnwrap)
+		TE.getOrElse(throwRequestErrors),
+		T.map(json)
 	)(),
 
 };

@@ -1,1 +1,1 @@
-export * from './handle-request-errors'
+export * from './throw-request-errors'

@@ -1,6 +1,6 @@
 <script lang="ts">
     import { enhance } from '$app/forms';
-	import type { ListItemModel } from '$lib/lists/db/interfaces.js';
+	import type { ListItemModel } from '$lib/interfaces/lists';
 
     export let data;
 
