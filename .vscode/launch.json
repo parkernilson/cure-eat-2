@@ -25,6 +25,17 @@
 			"args": ["run", "${relativeFile}"],
 			"smartStep": true,
 			"console": "integratedTerminal"
-		}
+		},
+		{
+			"type": "node",
+			"request": "launch",
+			"name": "Debug vite",
+			"autoAttachChildProcesses": true,
+			"skipFiles": ["<node_internals>/**", "**/node_modules/**"],
+			"program": "${workspaceRoot}/node_modules/vite/dist/node/cli.js",
+			"args": ["dev"],
+			"smartStep": true,
+			"console": "integratedTerminal"
+		},
 	]
 }

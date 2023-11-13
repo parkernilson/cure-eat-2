@@ -1,6 +1,6 @@
 import { authWithPassword } from '$lib/functions/auth/pocketbase';
 import { throwRequestErrors } from '$lib/functions/errors';
-import { json } from '@sveltejs/kit';
+import { redirect } from '@sveltejs/kit';
 import * as T from 'fp-ts/lib/Task';
 import * as TE from 'fp-ts/lib/TaskEither';
 import { pipe } from 'fp-ts/lib/function';
@@ -19,7 +19,6 @@ export const actions = {
 		),
 		TE.map(authResponse => authResponse.record),
 		TE.getOrElse(throwRequestErrors),
-		T.map(json)
+		T.map(() => { throw redirect(302, '/') })
 	)(),
-
 };

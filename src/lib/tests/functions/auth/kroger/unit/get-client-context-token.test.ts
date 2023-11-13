@@ -6,7 +6,7 @@ import PocketBase, { ClientResponseError } from 'pocketbase';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import createFetchMock from 'vitest-fetch-mock';
 import { getClientContextToken } from '$lib/functions/auth/kroger/get-client-context-token'
-import { client_token_record } from '../../../mock-data/tokens/tokens.mock';
+import { client_token_record } from '../../../../mock-data/tokens/tokens.mock';
 
 vi.mock('pocketbase', async () => {
 	const actual = await vi.importActual('pocketbase');

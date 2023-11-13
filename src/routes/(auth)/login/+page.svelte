@@ -6,13 +6,12 @@
 
 </script>
 
-<div class="h-full flex items-center">
-	<form method="POST">
-		<input name="username" type="text" placeholder="username">
-		<input name="password" type="password" placeholder="password">
-		<button type="submit">Login</button>
-	</form>
-	{#if data?.user}
-		<p>logged in as {data.user.username}</p>
-	{/if}
-</div>
+{#if data?.user}
+	<p>logged in as {data.user.username}</p>
+{/if}
+
+<form method="POST">
+	<input name="username" type="text" placeholder="username">
+	<input name="password" type="password" placeholder="password">
+	<button type="submit">Login</button>
+</form>
