@@ -1,12 +1,12 @@
 import { it, describe, expect } from 'vitest'
-import { clientToken } from '$lib/tests/mock-data/tokens/tokens.mock'
+import { client_token } from '$lib/tests/mock-data/tokens/tokens.mock'
 import { isExpiredNow } from '$lib/functions/utils/tokens'
 import { TOKEN_EXPIRATION_BUFFER_MILLIS } from '$lib/constants/auth/tokens'
 
 describe('token isExpired helper', () => {
     it('should return true if the token is expired', () => {
         const expiredToken = {
-            ...clientToken,
+            ...client_token,
             expires: "2000-10-29T04:08:43.628Z"
         }
 
@@ -17,7 +17,7 @@ describe('token isExpired helper', () => {
 
     it('should return false if the token is not expired', () => {
         const notExpiredToken = {
-            ...clientToken,
+            ...client_token,
             expires: "2200-10-29T04:08:43.628Z"
         }
 
@@ -26,7 +26,7 @@ describe('token isExpired helper', () => {
 
     it('should return true if the token is within the expiration buffer', () => {
         const tokenExpiresWithinBuffer = {
-            ...clientToken,
+            ...client_token,
             expires: (new Date(Date.now() + TOKEN_EXPIRATION_BUFFER_MILLIS - 1)).toISOString()
         }
 

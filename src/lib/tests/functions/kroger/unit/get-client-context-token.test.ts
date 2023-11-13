@@ -6,7 +6,7 @@ import PocketBase, { ClientResponseError } from 'pocketbase';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import createFetchMock from 'vitest-fetch-mock';
 import { getClientContextToken } from '$lib/functions/auth/kroger/get-client-context-token'
-import { clientTokenRecord } from '../../../mock-data/tokens/tokens.mock';
+import { client_token_record } from '../../../mock-data/tokens/tokens.mock';
 
 vi.mock('pocketbase', async () => {
 	const actual = await vi.importActual('pocketbase');
@@ -29,7 +29,7 @@ describe('get client context token', async () => {
 	it('should return token if it exists and is not expired', async () => {
 		const pb = new PocketBase();
 		const dbToken = {
-			...clientTokenRecord,
+			...client_token_record,
 			expires: '2200-10-29T04:08:43.628Z'
 		};
 		// @ts-ignore
@@ -46,7 +46,7 @@ describe('get client context token', async () => {
 		const pb = new PocketBase();
 
 		const expiredTokenRecordModel = {
-			...clientTokenRecord,
+			...client_token_record,
 			id: 'kroger',
 			expires: '2000-10-29T04:08:43.628Z'
 		};
@@ -82,7 +82,7 @@ describe('get client context token', async () => {
 
 		expect(token).toMatchObject(
 			E.right({
-				id: 'kroger',
+				company: 'kroger',
 				access_token: 'new jwt token',
 				scope: 'product.compact'
 			})
@@ -127,7 +127,7 @@ describe('get client context token', async () => {
         const token = await getClientContextToken(pb)();
 
         expect(token).toMatchObject(E.right({
-            id: 'kroger',
+            company: 'kroger',
             access_token: 'new jwt token',
             scope: 'product.compact'
         }))
