@@ -15,12 +15,13 @@ import type {
 	AccessTokenRecordModel,
 	KrogerAccessTokenResponse
 } from '$lib/interfaces/tokens/tokens';
+import { KROGER_ACCESS_TOKEN_ENDPOINT } from '$lib/constants/auth/kroger';
 
 const requestClientAccessToken = (clientId: string, clientSecret: string) =>
 	pipe(
 		TE.tryCatch(
 			() =>
-				fetch(`https://api.kroger.com/v1/connect/oauth2/token`, {
+				fetch(KROGER_ACCESS_TOKEN_ENDPOINT, {
 					method: 'POST',
 					headers: {
 						Authorization: `Basic ${btoa(`${clientId}:${clientSecret}`)}`,
