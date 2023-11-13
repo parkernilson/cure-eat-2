@@ -3,7 +3,6 @@ import type { SupportedCompany } from "../companies";
 
 export type AccessToken = {
 	company: SupportedCompany;
-	scope: string;
 	access_token: string;
 	expires: string;
 };

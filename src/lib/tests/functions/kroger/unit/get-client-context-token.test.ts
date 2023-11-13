@@ -28,26 +28,25 @@ describe('get client context token', async () => {
 
 	it('should return token if it exists and is not expired', async () => {
 		const pb = new PocketBase();
-		const dbToken = {
+		const clientTokenRecord = {
 			...client_token_record,
 			expires: '2200-10-29T04:08:43.628Z'
 		};
 		// @ts-ignore
 		vi.mocked(pb).collection = vi.fn().mockReturnValue({
-			getFirstListItem: vi.fn().mockResolvedValue(dbToken)
+			getFirstListItem: vi.fn().mockResolvedValue(clientTokenRecord)
 		});
 
 		const token = await getClientContextToken(pb)();
 
-		expect(token).toMatchObject(E.right(dbToken));
+		expect(token).toMatchObject(E.right(clientTokenRecord));
 	});
 
 	it('should renew token if it is expired', async () => {
 		const pb = new PocketBase();
 
-		const expiredTokenRecordModel = {
+		const expiredTokenRecord = {
 			...client_token_record,
-			id: 'kroger',
 			expires: '2000-10-29T04:08:43.628Z'
 		};
 
@@ -68,13 +67,13 @@ describe('get client context token', async () => {
 				created: '2021-10-29T04:08:43.628Z',
 				updated: '2021-10-29T04:08:43.628Z',
 				collectionId: 'f573cc9d-6430-48ec-b6d6-bddede935162',
-				collectionName: 'admin_tokens'
+				collectionName: 'client_tokens'
 			})
 		);
 
 		// @ts-ignore
 		vi.mocked(pb).collection = vi.fn().mockReturnValue({
-			getFirstListItem: vi.fn().mockResolvedValue(expiredTokenRecordModel),
+			getFirstListItem: vi.fn().mockResolvedValue(expiredTokenRecord),
 			update: updateMocked
 		});
 
@@ -84,7 +83,7 @@ describe('get client context token', async () => {
 			E.right({
 				company: 'kroger',
 				access_token: 'new jwt token',
-				scope: 'product.compact'
+				expires: expect.any(String),
 			})
 		);
 
@@ -99,7 +98,7 @@ describe('get client context token', async () => {
 		const createMocked = vi.fn().mockImplementation((data: AccessToken) =>
 			Promise.resolve({
 				...data,
-				id: 'kroger',
+				id: '7de04593-2991-4447-a911-36662e886c59',
 				created: '2021-10-29T04:08:43.628Z',
 				updated: '2021-10-29T04:08:43.628Z',
 				collectionId: 'f573cc9d-6430-48ec-b6d6-bddede935162',
@@ -109,8 +108,7 @@ describe('get client context token', async () => {
 
         // @ts-ignore
 		vi.mocked(pb).collection = vi.fn().mockReturnValue({
-			getFirstListItem: vi.fn().mockRejectedValueOnce(new ClientResponseError({ status: 404})),
-            update: vi.fn().mockRejectedValueOnce(new ClientResponseError({ status: 404})),
+			getFirstListItem: vi.fn().mockRejectedValue(new ClientResponseError({ status: 404})),
             create: createMocked
 		});
 
@@ -125,14 +123,14 @@ describe('get client context token', async () => {
         const expectedExpirationDate = new Date(Date.now() + 1800 * MILLISECONDS_PER_SECONDS);
 
         const token = await getClientContextToken(pb)();
+		const tokenInternal = unsafeUnwrap(token);
 
-        expect(token).toMatchObject(E.right({
+        expect(tokenInternal).toMatchObject({
             company: 'kroger',
             access_token: 'new jwt token',
-            scope: 'product.compact'
-        }))
+			expires: expect.any(String),
+        })
 
-        const tokenInternal = unsafeUnwrap(token);
         expect(tokenInternal.expires).toBeTypeOf('string')
         expect(new Date(tokenInternal.expires) >= expectedExpirationDate).toBe(true);
 
