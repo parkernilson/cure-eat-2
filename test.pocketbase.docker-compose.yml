@@ -4,7 +4,7 @@ services:
     build: 
       context: ./pb-image
       args: 
-        - VERSION=0.19.2
+        - VERSION=0.19.4
     container_name: cure-eat-pocketbase-test
     restart: unless-stopped
     ports:
