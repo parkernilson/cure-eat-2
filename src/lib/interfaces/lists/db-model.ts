@@ -1,4 +1,4 @@
-import type { BaseModel } from 'pocketbase';
+import type { BaseModel, RecordModel } from 'pocketbase';
 
 export interface ListItem {
 	value: string;
@@ -6,17 +6,10 @@ export interface ListItem {
 	list: string;
 }
 
-export type ListItemModel = ListItem & BaseModel
-
-export const isListItemModel = (item: Partial<ListItemModel>): item is ListItemModel =>
-	"list" in item && typeof item.list === "string" &&
-	"value" in item && typeof item.value === "string" &&
-	"id" in item && typeof item.id === "string" &&
-	"created" in item && typeof item.id === "string" &&
-	"updated" in item && typeof item.updated === "string"
+export type ListItemRecord = ListItem & RecordModel;
 
 export interface ListModel extends BaseModel {
 	title: string;
 }
 
-export type ListWithItems = ListModel & { items: ListItemModel[] };
+export type ListWithItems = ListModel & { items: ListItemRecord[] };

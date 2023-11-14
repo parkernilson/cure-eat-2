@@ -2,7 +2,6 @@ import { toError } from 'fp-ts/lib/Either'
 import * as TE from 'fp-ts/lib/TaskEither'
 import * as B from 'fp-ts/lib/boolean'
 import { pipe } from 'fp-ts/lib/function'
-// import { traceWithValue } from 'fp-ts-std/Debug'
 import Client, { ClientResponseError, type RecordModel } from 'pocketbase'
 
 /**

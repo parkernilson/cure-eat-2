@@ -1,12 +1,12 @@
 import { MILLISECONDS_PER_SECONDS } from '$lib/constants/misc/time';
 import type { AccessToken } from '$lib/interfaces/tokens/tokens';
-import { unsafeUnwrap } from 'fp-ts-std/Either';
 import * as E from 'fp-ts/lib/Either';
 import PocketBase, { ClientResponseError } from 'pocketbase';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import createFetchMock from 'vitest-fetch-mock';
 import { getClientContextToken } from '$lib/functions/auth/kroger/get-client-context-token'
 import { client_token_record } from '../../../../mock-data/tokens/tokens.mock';
+import { unsafeUnwrap } from '$lib/functions/utils/fp';
 
 vi.mock('pocketbase', async () => {
 	const actual = await vi.importActual('pocketbase');
@@ -87,7 +87,7 @@ describe('get client context token', async () => {
 			})
 		);
 
-		const tokenInternal = unsafeUnwrap(token);
+		const tokenInternal = unsafeUnwrap(token)
         expect(tokenInternal.expires).toBeTypeOf('string')
 		expect(new Date(tokenInternal.expires) >= expectedExpirationDate).toBe(true);
 	});
