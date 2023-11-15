@@ -1,4 +1,4 @@
-import type { ListItem, ListItemRecord, ListModel } from '$lib/interfaces/lists';
+import type { ListItem, ListRecord, ListItemRecord, ListWithItemsRecord } from '$lib/interfaces/lists';
 import { toError } from 'fp-ts/lib/Either';
 import * as TE from 'fp-ts/lib/TaskEither';
 import * as B from 'fp-ts/lib/boolean';
@@ -6,7 +6,7 @@ import { pipe } from 'fp-ts/lib/function';
 import type Client from 'pocketbase';
 
 export const getList = (pb: Client, listId: string) =>
-	TE.tryCatch(() => pb.collection('lists').getOne<ListModel>(listId), toError);
+	TE.tryCatch(() => pb.collection('lists').getOne<ListRecord>(listId), toError);
 
 export const getListItems = (pb: Client, listId: string) =>
 	TE.tryCatch(
@@ -23,7 +23,7 @@ export const getListWithItems = (pb: Client, listId: string) =>
 		TE.map(({ expand, ...list }) => ({
 			...list,
 			items: expand ? expand['list_items(list)'] : []
-		}))
+		}) as ListWithItemsRecord)
 	);
 
 /**
@@ -32,7 +32,7 @@ export const getListWithItems = (pb: Client, listId: string) =>
  * @returns
  */
 export const getAllLists = (pb: Client) =>
-	TE.tryCatch(() => pb.collection('lists').getFullList<ListModel>(), toError);
+	TE.tryCatch(() => pb.collection('lists').getFullList<ListRecord>(), toError);
 
 export const addItemToList = (pb: Client, listId: string, item: ListItem) =>
 	pipe(

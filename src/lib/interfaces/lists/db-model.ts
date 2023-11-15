@@ -1,15 +1,17 @@
-import type { BaseModel, RecordModel } from 'pocketbase';
+import type { RecordModel } from 'pocketbase';
 
-export interface ListItem {
+
+export type List = {
+	title: string;
+	owner: string;
+}
+export type ListItem = {
 	value: string;
-	/** Id of the list that this item belongs to */
 	list: string;
 }
 
+export type ListRecord = List & RecordModel;
+
 export type ListItemRecord = ListItem & RecordModel;
 
-export interface ListModel extends BaseModel {
-	title: string;
-}
-
-export type ListWithItems = ListModel & { items: ListItemRecord[] };
+export type ListWithItemsRecord = ListRecord & { items: ListItemRecord[] };

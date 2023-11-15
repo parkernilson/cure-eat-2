@@ -15,7 +15,7 @@ import type {
 	AccessTokenRecordModel,
 	KrogerAccessTokenResponse
 } from '$lib/interfaces/tokens/tokens';
-import { KROGER_ACCESS_TOKEN_ENDPOINT } from '$lib/constants/auth/kroger';
+import { KROGER_ACCESS_TOKEN_ENDPOINT } from '$lib/constants/apis/kroger';
 
 const requestClientAccessToken = (clientId: string, clientSecret: string) =>
 	pipe(
@@ -25,17 +25,22 @@ const requestClientAccessToken = (clientId: string, clientSecret: string) =>
 					method: 'POST',
 					headers: {
 						Authorization: `Basic ${btoa(`${clientId}:${clientSecret}`)}`,
-						'Content-Type': 'application/json'
+						'Content-Type': 'application/x-www-form-urlencoded'
 					},
-					body: JSON.stringify({
+					body: new URLSearchParams({
 						grant_type: 'client_credentials',
 						scope: 'product.compact'
 					})
 				}),
 			toError
 		),
+		TE.flatMap((response) =>
+			response.ok
+				? TE.right(response)
+				: TE.left(new Error(`Received error response ${response.status} ${response.statusText}`))
+		),
 		TE.flatMap(responseToJson<KrogerAccessTokenResponse>)
-	)
+	);
 
 const updateExistingToken =
 	(adminClient: Client) => (newToken: AccessToken) => (existingToken: AccessTokenRecordModel) =>
@@ -63,7 +68,7 @@ const createNewTokenIfNotFound = (adminClient: Client) => (newToken: AccessToken
 const saveClientAccessToken = (adminClient: Client) => (token: AccessToken) =>
 	pipe(
 		getTokenFromDatabase(adminClient),
-		TE.fold(createNewTokenIfNotFound(adminClient)(token), updateExistingToken(adminClient)(token)),
+		TE.fold(createNewTokenIfNotFound(adminClient)(token), updateExistingToken(adminClient)(token))
 	);
 
 const renewClientAccessToken = (adminClient: Client) =>
@@ -71,11 +76,11 @@ const renewClientAccessToken = (adminClient: Client) =>
 		requestClientAccessToken(PUBLIC_KROGER_CLIENT_ID, KROGER_SECRET),
 		TE.map(
 			(data) =>
-				(<AccessToken>{
+				<AccessToken>{
 					company: 'kroger',
 					access_token: data.access_token,
 					expires: new Date(Date.now() + data.expires_in * MILLISECONDS_PER_SECONDS).toISOString()
-				})
+				}
 		),
 		TE.flatMap(saveClientAccessToken(adminClient))
 	);
@@ -96,7 +101,7 @@ const renewTokenIfNotFound = (adminClient: Client) => (e: unknown) =>
 			() => TE.left(toError(e)),
 			() => renewClientAccessToken(adminClient)
 		)
-	)
+	);
 
 const getTokenFromDatabase = (adminClient: Client) =>
 	TE.tryCatch(
@@ -111,5 +116,5 @@ export const getClientContextToken = (adminClient: Client) =>
 	pipe(
 		getTokenFromDatabase(adminClient),
 		TE.orElse(renewTokenIfNotFound(adminClient)),
-		TE.flatMap(getNewTokenIfExpired(adminClient)),
+		TE.flatMap(getNewTokenIfExpired(adminClient))
 	);
