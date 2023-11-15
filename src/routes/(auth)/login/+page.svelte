@@ -2,6 +2,8 @@
 	import type { PageData } from './$types';
 
 	export let data: PageData;
+
+	let passwordVisible: boolean = false;
 </script>
 
 <div class="h-full flex items-center">
@@ -27,8 +29,14 @@
 					<input
 						class="border border-black px-1 rounded-sm w-full"
 						name="password"
-						type="password"
+						type={passwordVisible ? "text" : "password"}
 						placeholder="password"
+					/>
+					<!-- svelte-ignore a11y-no-static-element-interactions -->
+					<i
+						class="fa-solid {passwordVisible ? 'fa-eye-slash' : 'fa-eye'} ml-[-30px] cursor-pointer"
+						on:click={() => (passwordVisible = !passwordVisible)}
+						on:keydown={() => (passwordVisible = !passwordVisible)}
 					/>
 				</div>
 				<div class="flex flex-col items-center">
