@@ -19,6 +19,6 @@ export const actions = {
 		),
 		TE.map(authResponse => authResponse.record),
 		TE.getOrElse(throwRequestErrors),
-		T.map(() => { throw redirect(302, '/') })
+		T.map(() => { throw redirect(302, '/lists') })
 	)(),
 };
