@@ -40,7 +40,7 @@
 		<div class="flex justify-around mb-4">
 			<button class="border flex-1 hover:shadow-sm hover:text-blue-600" type="submit">Delete</button
 			>
-			<button class="flex-1 hover:text-blue-600" on:click={() => (showDeleteListModal = false)}
+			<button class="flex-1 hover:text-blue-600" type="button" on:click={() => (showDeleteListModal = false)}
 				>Cancel</button
 			>
 		</div>

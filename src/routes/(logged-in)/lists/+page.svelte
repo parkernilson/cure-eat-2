@@ -39,8 +39,8 @@ import ListColorRadio from '$lib/components/ui/ListColorRadio.svelte';
 		<input class="border px-3 w-full mb-5 mt-5" placeholder="Title" name="title" />
 		<ListColorRadio />
 		<div class="flex justify-around mb-4">
-			<button class="border flex-1 hover:shadow-sm hover:text-blue-600">Create</button>
-			<button class="flex-1 hover:text-blue-600">Cancel</button>
+			<button class="border flex-1 hover:shadow-sm hover:text-blue-600" type="submit">Create</button>
+			<button class="flex-1 hover:text-blue-600" type="button" on:click={() => showCreateListModal = false}>Cancel</button>
 		</div>
 	</form>
 </Modal>
