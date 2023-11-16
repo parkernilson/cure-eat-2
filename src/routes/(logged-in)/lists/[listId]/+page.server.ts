@@ -4,6 +4,7 @@ import { createListItemObject } from '$lib/functions/lists';
 import { addItemToListCurried, getListWithItemsCurried } from '$lib/functions/lists/db-accessors';
 import { searchKrogerProduct } from '$lib/functions/products/kroger/search-product.js';
 import { getFormData, getStringWithKey } from '$lib/functions/utils/fp/form-data';
+import { sequenceT } from 'fp-ts/lib/Apply';
 import * as TE from 'fp-ts/lib/TaskEither';
 import { pipe } from 'fp-ts/lib/function';
 
@@ -19,17 +20,18 @@ export const actions = {
 	addItem: async ({ locals, params, request }) =>
 		pipe(
 			getFormData(request),
-			TE.flatMapEither(getStringWithKey('value')),
-			TE.map(createListItemObject(params.listId)),
-			TE.flatMap(addItemToListCurried(locals.pb)(params.listId)),
+			TE.flatMap(formData => pipe(
+				TE.fromEither(getStringWithKey(formData)('value')),
+				TE.map(createListItemObject(params.listId)),
+				TE.flatMap(addItemToListCurried(locals.pb)(params.listId)),
+			)),
 			TE.getOrElse(throwRequestErrors)
 		)(),
 	searchProduct: async ({ request }) =>
 		pipe(
-			getAdminClient(),
-			TE.flatMap(adminClient => pipe(
-				getFormData(request),
-				TE.flatMapEither(getStringWithKey('searchTerm')),
+			sequenceT(TE.ApplicativePar)(getAdminClient(), getFormData(request)),
+			TE.flatMap(([adminClient, formData]) => pipe(
+				TE.fromEither(getStringWithKey(formData)('searchTerm')),
 				TE.flatMap(searchKrogerProduct(adminClient)),
 			)),
 			TE.getOrElse(throwRequestErrors)

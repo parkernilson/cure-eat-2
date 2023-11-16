@@ -1,4 +1,4 @@
-import type { ListItem, ListRecord, ListItemRecord, ListWithItemsRecord } from '$lib/interfaces/lists';
+import type { ListItem, ListRecord, ListItemRecord, ListWithItemsRecord, List } from '$lib/interfaces/lists';
 import { toError } from 'fp-ts/lib/Either';
 import * as TE from 'fp-ts/lib/TaskEither';
 import * as B from 'fp-ts/lib/boolean';
@@ -33,6 +33,9 @@ export const getListWithItems = (pb: Client, listId: string) =>
  */
 export const getAllLists = (pb: Client) =>
 	TE.tryCatch(() => pb.collection('lists').getFullList<ListRecord>(), toError);
+
+export const createList = (pb: Client) => (owner: string) => (list: Omit<List, 'owner'>) =>
+	TE.tryCatch(() => pb.collection('lists').create<ListRecord>({ ...list, owner }), toError);
 
 export const addItemToList = (pb: Client, listId: string, item: ListItem) =>
 	pipe(
