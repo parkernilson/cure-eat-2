@@ -27,6 +27,11 @@
             <a href="/lists/{list.id}">
                 <div class="border rounded-sm p-3">
                     <h1 class="font-display text-2xl">{list.title}</h1>
+					{#if list.items.length === 0}
+						<p class="font-body">This list is empty</p>
+					{:else}
+						<p class="font-body">This list has {list.items.length} items</p>
+					{/if}
                 </div>
             </a>
 		{/each}

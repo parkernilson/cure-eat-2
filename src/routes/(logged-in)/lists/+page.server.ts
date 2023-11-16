@@ -2,13 +2,13 @@ import * as TE from 'fp-ts/lib/TaskEither';
 import * as E from 'fp-ts/lib/Either';
 import { sequenceS, sequenceT } from 'fp-ts/lib/Apply';
 import { pipe } from 'fp-ts/lib/function';
-import { createList, getAllLists } from '$lib/functions/lists/db-accessors.js';
+import { createList, getAllListsWithItems } from '$lib/functions/lists/db-accessors.js';
 import { throwRequestErrors } from '$lib/functions/errors/throw-request-errors.js';
 import { getFormData, getStringWithKey } from '$lib/functions/utils/fp';
 
 export const load = ({ locals }) =>
 	pipe(
-		getAllLists(locals.pb),
+		getAllListsWithItems(locals.pb),
 		TE.map((lists) => ({ lists, user: locals.pb.authStore.model })),
 		TE.getOrElse(throwRequestErrors)
 	)();
