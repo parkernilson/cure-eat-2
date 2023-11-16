@@ -1,6 +1,6 @@
 <script lang="ts">
 	import ListOfListsItem from '$lib/components/lists/ListOfListsItem.svelte';
-import ListColorRadio from '$lib/components/ui/ListColorRadio.svelte';
+	import ListColorRadio from '$lib/components/ui/ListColorRadio.svelte';
 	import Modal from '$lib/components/ui/Modal.svelte';
 	import { LIST_COLORS } from '$lib/constants/ui';
 
