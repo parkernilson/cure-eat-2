@@ -1,5 +1,7 @@
 <script lang="ts">
-	import Modal from '$lib/components/ui/Modal.svelte';
+	import ListColorRadio from '$lib/components/ui/ListColorRadio.svelte';
+import Modal from '$lib/components/ui/Modal.svelte';
+	import { LIST_COLORS } from '$lib/constants/ui';
 
 	export let data;
 
@@ -24,24 +26,28 @@
 {:else}
 	<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
 		{#each data.lists as list}
-            <a href="/lists/{list.id}">
-                <div class="border rounded-sm p-3">
-                    <h1 class="font-display text-2xl">{list.title}</h1>
+			<a href="/lists/{list.id}">
+				<div class="border rounded-sm p-3 {LIST_COLORS[list.color].bgColor}">
+					<h1 class="font-display text-2xl">{list.title}</h1>
 					{#if list.items.length === 0}
 						<p class="font-body">This list is empty</p>
 					{:else}
 						<p class="font-body">This list has {list.items.length} items</p>
 					{/if}
-                </div>
-            </a>
+				</div>
+			</a>
 		{/each}
 	</div>
 {/if}
 
 <Modal bind:showModal={showCreateListModal}>
-	<h1 slot="header" class="font-body font-thin">Create a new list</h1>
+	<h1 slot="header" class="font-body text-xl">Create a new list</h1>
 	<form method="POST" action="?/createList">
-		<input class="border px-3" name="title" />
-		<button>Create List</button>
+		<input class="border px-3 w-full mb-5 mt-5" placeholder="Title" name="title" />
+		<ListColorRadio />
+		<div class="flex justify-around mb-4">
+			<button class="border flex-1 hover:shadow-sm hover:text-blue-600">Create</button>
+			<button class="flex-1 hover:text-blue-600">Cancel</button>
+		</div>
 	</form>
 </Modal>

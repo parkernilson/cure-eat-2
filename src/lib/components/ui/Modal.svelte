@@ -6,9 +6,6 @@
 	$: if (dialog && showModal) dialog.showModal();
 </script>
 
-<!-- Listen for clicks outside of the dialog, and close on click -->
-<!-- <svelte:window on:click={() => dialog.close()} /> -->
-
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
 <dialog
@@ -29,12 +26,6 @@
 			<slot name="header" />
 			<hr class="mb-3" />
 			<slot />
-		</div>
-		<!-- Footer section of dialog -->
-		<div>
-			<hr class="mt-3" />
-			<!-- svelte-ignore a11y-autofocus -->
-			<button autofocus on:click={() => dialog.close()}>Close</button>
 		</div>
 	</div>
 </dialog>

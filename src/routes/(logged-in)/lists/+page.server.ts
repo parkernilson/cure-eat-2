@@ -5,6 +5,7 @@ import { pipe } from 'fp-ts/lib/function';
 import { createList, getAllListsWithItems } from '$lib/functions/lists/db-accessors.js';
 import { throwRequestErrors } from '$lib/functions/errors/throw-request-errors.js';
 import { getFormData, getStringWithKey } from '$lib/functions/utils/fp';
+import { isSupportedColor } from '$lib/interfaces/lists/db-model.js';
 
 export const load = ({ locals }) =>
 	pipe(
@@ -14,9 +15,28 @@ export const load = ({ locals }) =>
 	)();
 
 const getListFromFormData = (formData: FormData) =>
-	sequenceS(E.Applicative)({
-		title: getStringWithKey(formData)('title')
-	})
+	pipe(
+		sequenceS(E.Applicative)({
+			title: pipe(
+				getStringWithKey(formData)('title'),
+				E.flatMap(
+					E.fromPredicate(
+						(title) => title.length > 2,
+						() => new Error('Title must be at least 3 characters')
+					)
+				)
+			),
+			color: pipe(
+				getStringWithKey(formData)('color'),
+				E.flatMap(
+					E.fromPredicate(
+						isSupportedColor,
+						(wrongColor) => new Error(`Invalid color: ${wrongColor}`)
+					)
+				)
+			)
+		})
+	);
 
 export const actions = {
 	createList: ({ request, locals }) =>
@@ -28,9 +48,9 @@ export const actions = {
 			TE.flatMap(([formData, userModel]) =>
 				pipe(
 					TE.fromEither(getListFromFormData(formData)),
-					TE.flatMap(createList(locals.pb)(userModel.id)),
+					TE.flatMap(createList(locals.pb)(userModel.id))
 				)
 			),
-            TE.getOrElse(throwRequestErrors)
+			TE.getOrElse(throwRequestErrors)
 		)()
 };
