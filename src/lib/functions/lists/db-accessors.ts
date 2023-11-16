@@ -63,6 +63,9 @@ export const getAllListsWithItems = (pb: Client) =>
 export const createList = (pb: Client) => (owner: string) => (list: Omit<List, 'owner'>) =>
 	TE.tryCatch(() => pb.collection('lists').create<ListRecord>({ ...list, owner }), toError);
 
+export const deleteList = (pb: Client) => (listId: string) =>
+	TE.tryCatch(() => pb.collection('lists').delete(listId), toError);
+
 export const addItemToList = (pb: Client, listId: string, item: ListItem) =>
 	pipe(
 		listId === item.list,

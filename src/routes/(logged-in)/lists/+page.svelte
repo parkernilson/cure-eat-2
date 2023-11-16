@@ -1,11 +1,13 @@
 <script lang="ts">
-	import ListColorRadio from '$lib/components/ui/ListColorRadio.svelte';
-import Modal from '$lib/components/ui/Modal.svelte';
+	import ListOfListsItem from '$lib/components/lists/ListOfListsItem.svelte';
+import ListColorRadio from '$lib/components/ui/ListColorRadio.svelte';
+	import Modal from '$lib/components/ui/Modal.svelte';
 	import { LIST_COLORS } from '$lib/constants/ui';
 
 	export let data;
 
 	let showCreateListModal = false;
+	let showDeleteListModal = false;
 </script>
 
 <div class="flex items-center justify-between mt-8">
@@ -26,16 +28,7 @@ import Modal from '$lib/components/ui/Modal.svelte';
 {:else}
 	<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
 		{#each data.lists as list}
-			<a href="/lists/{list.id}">
-				<div class="border rounded-sm p-3 {LIST_COLORS[list.color].bgColor}">
-					<h1 class="font-display text-2xl">{list.title}</h1>
-					{#if list.items.length === 0}
-						<p class="font-body">This list is empty</p>
-					{:else}
-						<p class="font-body">This list has {list.items.length} items</p>
-					{/if}
-				</div>
-			</a>
+			<ListOfListsItem list={list} />
 		{/each}
 	</div>
 {/if}

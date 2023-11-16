@@ -2,7 +2,7 @@ import * as TE from 'fp-ts/lib/TaskEither';
 import * as E from 'fp-ts/lib/Either';
 import { sequenceS, sequenceT } from 'fp-ts/lib/Apply';
 import { pipe } from 'fp-ts/lib/function';
-import { createList, getAllListsWithItems } from '$lib/functions/lists/db-accessors.js';
+import { createList, deleteList, getAllListsWithItems } from '$lib/functions/lists/db-accessors.js';
 import { throwRequestErrors } from '$lib/functions/errors/throw-request-errors.js';
 import { getFormData, getStringWithKey } from '$lib/functions/utils/fp';
 import { isSupportedColor } from '$lib/interfaces/lists/db-model.js';
@@ -51,6 +51,13 @@ export const actions = {
 					TE.flatMap(createList(locals.pb)(userModel.id))
 				)
 			),
+			TE.getOrElse(throwRequestErrors)
+		)(),
+	deleteList: ({ request, locals }) =>
+		pipe(
+			getFormData(request),
+			TE.flatMapEither(formData => getStringWithKey(formData)('listId')),
+			TE.flatMap(deleteList(locals.pb)),
 			TE.getOrElse(throwRequestErrors)
 		)()
 };
