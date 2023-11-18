@@ -72,12 +72,13 @@
                 mr-3
             "
 			/>
-			<form bind:this={newItemForm} method="post" action="?/addItem">
+			<form bind:this={newItemForm} method="post" action="?/addItem" on:submit|preventDefault>
 				<input
 					bind:this={newItemInput}
 					class="flex-1 m-3"
 					name="value"
 					bind:value={creatingNewItem.value}
+                    on:keydown={handleNewItemKeyDown}
 				/>
 			</form>
 		</div>
