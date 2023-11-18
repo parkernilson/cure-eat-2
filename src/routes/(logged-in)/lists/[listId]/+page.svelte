@@ -31,32 +31,28 @@
 			B.fold(
 				() => doNothing(),
 				() =>
-                    pipe(
-                        performIO(
-                            () =>
-                                
-                                (creatingNewItem = {
-                                    value: '',
-                                    index: data.list.items.findIndex((_) => _.id === eventItem.id)
-                                })
-                        ),
-                        IO.flatMap(() => performIO(() => e.preventDefault()))
-                    )
+					performIO(() => {
+						creatingNewItem = {
+							value: '',
+							index: data.list.items.findIndex((_) => _.id === eventItem.id)
+						};
+						e.preventDefault(); // prevent the event from transferring to the newly focused input
+					})
 			)
 		)();
 
-    const handleNewItemKeyDown = (e: KeyboardEvent) =>
-        pipe(
-            e.key == 'Enter' && creatingNewItem?.value.trim() !== '',
-            B.fold(
-                () => doNothing(),
-                () =>
-                    pipe(
-                        performIO(() => newItemForm.submit()),
-                        IO.flatMap(() => performIO(() => (creatingNewItem = null)))
-                    )
-            )
-        )();
+	const handleNewItemKeyDown = (e: KeyboardEvent) =>
+		pipe(
+			e.key == 'Enter' && creatingNewItem?.value.trim() !== '',
+			B.fold(
+				() => doNothing(),
+				() =>
+					performIO(() => {
+						newItemForm.submit();
+						creatingNewItem = null;
+					})
+			)
+		)();
 </script>
 
 <div class="flex items-center mt-8">
@@ -77,23 +73,17 @@
             "
 			/>
 			<form bind:this={newItemForm} method="post" action="?/addItem">
-                <input 
-                    bind:this={newItemInput} 
-                    class="flex-1 m-3" 
-                    name="value"
-                    bind:value={creatingNewItem.value} 
-                />
+				<input
+					bind:this={newItemInput}
+					class="flex-1 m-3"
+					name="value"
+					bind:value={creatingNewItem.value}
+				/>
 			</form>
 		</div>
 	{/if}
-    
+
 	{#if i < data.list.items.length - 1}
 		<hr />
 	{/if}
 {/each}
-
-<!-- add item to list -->
-<!-- <form method="post" action="?/addItem" use:enhance>
-    <input name="value" type="text" placeholder="new item">
-    <button type="submit">Add new item</button>
-</form> -->
