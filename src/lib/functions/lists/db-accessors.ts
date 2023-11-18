@@ -75,6 +75,9 @@ export const addItemToList = (pb: Client, listId: string, item: ListItem) =>
 		)
 	);
 
+export const deleteListItem = (pb: Client) => (itemId: string) =>
+	TE.tryCatch(() => pb.collection('list_items').delete(itemId), toError);
+
 ///////////////// Curried functions /////////////////////
 
 export const getListCurried = (pb: Client) => (listId: string) => getList(pb, listId);

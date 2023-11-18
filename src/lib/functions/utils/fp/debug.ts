@@ -10,3 +10,14 @@ export const debugTE: <E, A>(self: TaskEither<E, A>) => TaskEither<E, A> = flow(
 	TE.tapIO(log),
 	TE.tapError((e) => TE.of(logError(e)))
 );
+
+export const trace = <A>(a: A) => {
+	console.log(a);
+	return a;
+}
+
+export const traceWithMessage = <A>(loggable: unknown) => (a: A) => {
+	console.log(loggable);
+	console.log(a)
+	return a;
+}
