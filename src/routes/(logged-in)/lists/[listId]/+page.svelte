@@ -11,9 +11,8 @@
 
 	export let data;
 
-	const sortByDate = (a: string, b: string) => Date.parse(a) - Date.parse(b);
-	const sortListItemsByDate = (a: ListItemRecord, b: ListItemRecord) =>
-		sortByDate(a.created, b.created);
+	const sortByOrdinal = (a: ListItemRecord, b: ListItemRecord) =>
+		a.ordinal - b.ordinal;
 
 	type NewItem = {
 		value: string;
@@ -59,7 +58,7 @@
 	<h1 class="font-display text-4xl text-slate-600">{data.list.title}</h1>
 </div>
 <hr class="mb-8" />
-{#each data.list.items.sort(sortListItemsByDate) as item, i}
+{#each data.list.items.sort(sortByOrdinal) as item, i}
 	<ListItem {item} onKeyDown={handleListItemKeyDown} />
 
 	{#if creatingNewItem && i === creatingNewItem.index}
@@ -80,6 +79,7 @@
 					bind:value={creatingNewItem.value}
                     on:keydown={handleNewItemKeyDown}
 				/>
+				<input value={creatingNewItem.index + 1} name="ordinal" type="hidden" />
 			</form>
 		</div>
 	{/if}
