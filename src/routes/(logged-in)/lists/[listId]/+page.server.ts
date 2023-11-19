@@ -1,11 +1,12 @@
 import { getAdminClient } from '$lib/functions/auth/pocketbase';
 import { throwRequestErrors } from '$lib/functions/errors/throw-request-errors.js';
-import { createListItemObject } from '$lib/functions/lists';
+import { createDefaultListItemObject } from '$lib/functions/lists';
 import { addItemToListCurried, deleteListItem, getListWithItemsCurried } from '$lib/functions/lists/db-accessors';
 import { searchKrogerProduct } from '$lib/functions/products/kroger/search-product.js';
 import { getFormData, getStringWithKey } from '$lib/functions/utils/fp/form-data';
-import { sequenceT } from 'fp-ts/lib/Apply';
+import { sequenceS, sequenceT } from 'fp-ts/lib/Apply';
 import * as TE from 'fp-ts/lib/TaskEither';
+import * as E from 'fp-ts/lib/Either'
 import { pipe } from 'fp-ts/lib/function';
 
 export const load = ({ locals, params }) =>
@@ -21,8 +22,12 @@ export const actions = {
 		pipe(
 			getFormData(request),
 			TE.flatMap(formData => pipe(
-				TE.fromEither(getStringWithKey(formData)('value')),
-				TE.map(createListItemObject(params.listId)),
+				sequenceS(E.Applicative)({
+					value: getStringWithKey(formData)('value'),
+					ordinal: pipe(getStringWithKey(formData)('ordinal'), E.map(Number)),
+				}),
+				TE.fromEither,
+				TE.map(createDefaultListItemObject(params.listId)),
 				TE.flatMap(addItemToListCurried(locals.pb)(params.listId)),
 			)),
 			TE.getOrElse(throwRequestErrors)

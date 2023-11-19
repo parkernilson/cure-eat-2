@@ -53,10 +53,13 @@ export const getAllListsWithItems = (pb: Client) =>
 			toError
 		),
 		TE.map((lists) =>
-			lists.map(({ expand, ...list }) => ({
-				...list,
-				items: expand ? expand['list_items(list)'] : []
-			} as ListWithItemsRecord))
+			lists.map(
+				({ expand, ...list }) =>
+					({
+						...list,
+						items: expand ? expand['list_items(list)'] : []
+					} as ListWithItemsRecord)
+			)
 		)
 	);
 

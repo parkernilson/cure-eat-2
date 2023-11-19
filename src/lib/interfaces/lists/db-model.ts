@@ -27,6 +27,7 @@ export type List = {
 export type ListItem = {
 	value: string;
 	list: string;
+	ordinal: number;
 	checked: boolean;
 };
 

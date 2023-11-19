@@ -1,4 +1,10 @@
-import type { ListItem } from "$lib/interfaces/lists";
+import type { ListItem } from '$lib/interfaces/lists';
 
-export const createListItemObject =
-	(listId: string) => (value: string): ListItem => ({ value, list: listId });
+export const createDefaultListItemObject =
+	(listId: string) =>
+	({value, ordinal}: {value: string, ordinal: number}): ListItem => ({ 
+		list: listId, 
+		value, 
+		ordinal, 
+		checked: false 
+	});
