@@ -1,28 +1,20 @@
 <script lang="ts">
-	import * as B from 'fp-ts/lib/boolean';
-	import * as IO from 'fp-ts/lib/IO';
-	import { flow, pipe } from 'fp-ts/lib/function';
-	import { enhance } from '$app/forms';
 	import ListItem from '$lib/components/lists/ListItem.svelte';
-	import type { ListItemRecord } from '$lib/interfaces/lists';
+	import NewItem from '$lib/components/lists/NewItem.svelte';
 	import { doNothing, performIO } from '$lib/functions/utils/fp/io';
-	import { concatAll } from 'fp-ts/lib/Monoid.js';
-	import { getApplicativeMonoid } from 'fp-ts/lib/Applicative.js';
+	import type { ListItemRecord } from '$lib/interfaces/lists';
+	import * as B from 'fp-ts/lib/boolean';
+	import { pipe } from 'fp-ts/lib/function';
 
 	export let data;
 
-	const sortByOrdinal = (a: ListItemRecord, b: ListItemRecord) =>
-		a.ordinal - b.ordinal;
+	const sortByOrdinal = (a: ListItemRecord, b: ListItemRecord) => a.ordinal - b.ordinal;
 
 	type NewItem = {
 		value: string;
 		index: number;
 	};
 	let creatingNewItem: NewItem | null;
-	let newItemInput: HTMLInputElement;
-	$: newItemInput && newItemInput.focus();
-
-	let newItemForm: HTMLFormElement;
 
 	const handleListItemKeyDown = (e: KeyboardEvent, eventItem: ListItemRecord) =>
 		pipe(
@@ -33,55 +25,33 @@
 					performIO(() => {
 						creatingNewItem = {
 							value: '',
-							index: data.list.items.findIndex((_) => _.id === eventItem.id)
+							index: data.list.items.findIndex((itemToInsertAfter) => itemToInsertAfter.id === eventItem.id)
 						};
 						e.preventDefault(); // prevent the event from transferring to the newly focused input
 					})
 			)
 		)();
 
-	const handleNewItemKeyDown = (e: KeyboardEvent) =>
-		pipe(
-			e.key == 'Enter' && creatingNewItem?.value.trim() !== '',
-			B.fold(
-				() => doNothing(),
-				() =>
-					performIO(() => {
-						newItemForm.submit();
-						creatingNewItem = null;
-					})
-			)
-		)();
+
 </script>
 
 <div class="flex items-center mt-8">
 	<h1 class="font-display text-4xl text-slate-600">{data.list.title}</h1>
 </div>
 <hr class="mb-8" />
+
+{#if data.list.items.length === 0}
+	<NewItem placeholder="Tap to create your first item" ordinal={0} />
+{/if}
+
 {#each data.list.items.sort(sortByOrdinal) as item, i}
 	<ListItem {item} onKeyDown={handleListItemKeyDown} />
 
 	{#if creatingNewItem && i === creatingNewItem.index}
 		<hr />
 
-		<div class="flex items-center">
-			<i
-				class="
-                fa-regular fa-circle
-                mr-3
-            "
-			/>
-			<form bind:this={newItemForm} method="post" action="?/addItem" on:submit|preventDefault>
-				<input
-					bind:this={newItemInput}
-					class="flex-1 m-3"
-					name="value"
-					bind:value={creatingNewItem.value}
-                    on:keydown={handleNewItemKeyDown}
-				/>
-				<input value={creatingNewItem.index + 1} name="ordinal" type="hidden" />
-			</form>
-		</div>
+		<NewItem ordinal={i + 1} />
+
 	{/if}
 
 	{#if i < data.list.items.length - 1}
