@@ -1,7 +1,7 @@
 import { getAdminClient } from '$lib/functions/auth/pocketbase';
 import { throwRequestErrors } from '$lib/functions/errors/throw-request-errors.js';
 import { createDefaultListItemObject } from '$lib/functions/lists';
-import { addItemToListCurried, deleteListItem, getListWithItemsCurried } from '$lib/functions/lists/db-accessors';
+import { addItemToListCurried, deleteListItem, getListWithItemsCurried, updateItem } from '$lib/functions/lists/db-accessors';
 import { searchKrogerProduct } from '$lib/functions/products/kroger/search-product.js';
 import { getFormData, getStringWithKey } from '$lib/functions/utils/fp/form-data';
 import { sequenceS, sequenceT } from 'fp-ts/lib/Apply';
@@ -18,6 +18,19 @@ export const load = ({ locals, params }) =>
 	)();
 
 export const actions = {
+	updateItem: async({ locals, request }) =>
+		pipe(
+			getFormData(request),
+			TE.flatMap(formData => pipe(
+				sequenceS(E.Applicative)({
+					value: getStringWithKey(formData)('value'),
+					itemId: getStringWithKey(formData)('itemId'),
+				}),
+				TE.fromEither,
+				TE.flatMap(({ itemId, ...listItem }) => updateItem(locals.pb)(itemId)(listItem)),
+			)),
+			TE.getOrElse(throwRequestErrors)
+		)(),
 	addItem: async ({ locals, params, request }) =>
 		pipe(
 			getFormData(request),

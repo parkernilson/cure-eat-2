@@ -78,6 +78,9 @@ export const addItemToList = (pb: Client, listId: string, item: ListItem) =>
 		)
 	);
 
+export const updateItem = (pb: Client) => (itemId: string) => (item: Partial<ListItem>) =>
+	TE.tryCatch(() => pb.collection('list_items').update<ListItemRecord>(itemId, item), toError);
+
 export const deleteListItem = (pb: Client) => (itemId: string) =>
 	TE.tryCatch(() => pb.collection('list_items').delete(itemId), toError);
 
