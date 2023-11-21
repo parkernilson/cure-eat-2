@@ -6,6 +6,7 @@ import { searchKrogerProduct } from '$lib/functions/products/kroger/search-produ
 import { getFormData, getStringWithKey } from '$lib/functions/utils/fp/form-data';
 import { sequenceS, sequenceT } from 'fp-ts/lib/Apply';
 import * as TE from 'fp-ts/lib/TaskEither';
+import * as T from 'fp-ts/lib/Task'
 import * as E from 'fp-ts/lib/Either'
 import { pipe } from 'fp-ts/lib/function';
 
@@ -29,7 +30,8 @@ export const actions = {
 				TE.fromEither,
 				TE.flatMap(({ itemId, ...listItem }) => updateItem(locals.pb)(itemId)(listItem)),
 			)),
-			TE.getOrElse(throwRequestErrors)
+			TE.getOrElse(throwRequestErrors),
+			T.map(listItemRecord => ({ listItemRecord, formId: 'updateItem' as const }))
 		)(),
 	addItem: async ({ locals, params, request }) =>
 		pipe(
@@ -43,7 +45,8 @@ export const actions = {
 				TE.map(createDefaultListItemObject(params.listId)),
 				TE.flatMap(addItemToListCurried(locals.pb)(params.listId)),
 			)),
-			TE.getOrElse(throwRequestErrors)
+			TE.getOrElse(throwRequestErrors),
+			T.map(listItemRecord => ({ listItemRecord, formId: 'addItem' as const }))
 		)(),
 	deleteItem: async ({ locals, request }) =>
 		pipe(
@@ -52,7 +55,8 @@ export const actions = {
 				TE.fromEither(getStringWithKey(formData)('itemId')),
 				TE.flatMap(deleteListItem(locals.pb))
 			)),
-			TE.getOrElse(throwRequestErrors)
+			TE.getOrElse(throwRequestErrors),
+			T.map(success => ({ success, formId: 'deleteItem' as const }))
 		)(),
 	searchProduct: async ({ request }) =>
 		pipe(
@@ -61,6 +65,7 @@ export const actions = {
 				TE.fromEither(getStringWithKey(formData)('searchTerm')),
 				TE.flatMap(searchKrogerProduct(adminClient)),
 			)),
-			TE.getOrElse(throwRequestErrors)
+			TE.getOrElse(throwRequestErrors),
+			T.map(product => ({ product, formId: 'searchProduct' as const }))
 		)()
 };
