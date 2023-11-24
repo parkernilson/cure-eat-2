@@ -1,0 +1,7 @@
+{
+  "availability-zones:account=445044180652:region=us-west-1": [
+    "us-west-1a",
+    "us-west-1b"
+  ],
+  "ami:account=445044180652:filters.image-type.0=machine:filters.name.0=AmazonLinux2023-Node-PM2-Caddy:filters.state.0=available:region=us-west-1": "ami-0f07b8b995e8dbcb3"
+}
