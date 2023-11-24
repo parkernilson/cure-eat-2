@@ -31,6 +31,12 @@ module.exports = {
 			rules: {
 				'@typescript-eslint/ban-ts-comment': 0
 			}
+		},
+		{
+			files: 'cdk/**/*.ts',
+			rules: {
+				'@typescript-eslint/no-unused-vars': 0
+			}
 		}
 	]
 };
