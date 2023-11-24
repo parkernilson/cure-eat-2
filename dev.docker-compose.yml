@@ -2,14 +2,16 @@ version: "3.7"
 services:
   pocketbase:
     build: 
-      context: .
+      context: ./apps/pocketbase
       args: 
         - VERSION=0.19.4
-    container_name: cure-eat-pocketbase-test
+    container_name: cure-eat-pocketbase-dev
     restart: unless-stopped
+    command: --debug
     ports:
-      - "8091:8090"
+      - "8090:8090"
     volumes:
+      - ./pb_data:/pb_data
       - ./pb_migrations:/pb_migrations
       - ./pb_hooks:/pb_hooks
     healthcheck: #optional (recommended) since v0.10.0
@@ -17,3 +19,11 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+  webapp:
+    build:
+      context: ./apps/web
+      dockerfile: Dockerfile.dev
+    container_name: cure-eat-webapp-dev
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
