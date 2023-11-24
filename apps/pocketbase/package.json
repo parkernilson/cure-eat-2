@@ -4,7 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "pb": "docker compose -f dev.pocketbase.docker-compose.yml run --entrypoint pocketbase pocketbase",
+		"start:pb-test": "docker compose -f 'test.pocketbase.docker-compose.yml' up -d",
+		"stop:pb-test": "docker compose -f 'test.pocketbase.docker-compose.yml' down",
+		"start:pb-dev": "docker compose -f 'dev.pocketbase.docker-compose.yml' up",
+		"stop:pb-dev": "docker compose -f 'dev.pocketbase.docker-compose.yml' down"
   },
   "author": "",
   "license": "ISC"
