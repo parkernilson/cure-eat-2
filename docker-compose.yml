@@ -5,6 +5,7 @@ services:
       context: ./apps/pocketbase
       args: 
         - VERSION=0.19.4
+    image: cureeat-pocketbase
     container_name: cureeat-pocketbase
     restart: unless-stopped
     ports:
@@ -24,6 +25,7 @@ services:
       dockerfile: Dockerfile
       additional_contexts:
         monorepo: ./
+    image: cureeat-web
     container_name: cureeat-web
     restart: unless-stopped
     ports:

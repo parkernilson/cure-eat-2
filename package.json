@@ -3,7 +3,11 @@
 	"version": "0.0.1",
 	"private": true,
 	"scripts": {
-		"dev": "npm run start:pb-dev -w @cureeat/pocketbase & npm run dev -w @cureeat/web"
+		"dev": "docker compose -f docker-compose.dev.yml up",
+		"dev:build": "docker compose -f docker-compose.dev.yml up --build",
+		"dev:down": "docker compose -f docker-compose.dev.yml down",
+		"prod": "docker compose -f docker-compose.yml up",
+		"prod:build": "docker compose -f docker-compose.yml up --build"
 	},
 	"workspaces": [
 		"apps/*",

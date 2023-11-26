@@ -23,39 +23,16 @@
 
 	const debouncedUpdate = debounce(() => updateItemForm?.requestSubmit(), 1000);
 
-	const handleBackspaceEvent = (e: KeyboardEvent) =>
-		pipe(
-			e.key === 'Backspace' && value === '',
-			B.fold(
-				() => doNothing(),
-				() => performIO(() => deleteItemForm.requestSubmit())
-			)
-		);
-
-	const handleEnterEvent = (e: KeyboardEvent) =>
-		pipe(
-			e.key === 'Enter' && value.trim() !== '',
-			B.fold(
-				() => doNothing(),
-				() =>
-					pipe(
-						performIO(() => updateItemForm.requestSubmit()),
-						IO.flatMap(() => performIO(() => addItemForm.requestSubmit()))
-					)
-			)
-		);
-
-	const handleValueUpdate = () =>
-		pipe(
-			value.trim().length > 0,
-			B.fold(
-				() => doNothing(),
-				() => performIO(() => debouncedUpdate())
-			)
-		);
-
-	const handleKeyDown = (e: KeyboardEvent) =>
-		sequenceT(IO.Applicative)(handleValueUpdate(), handleEnterEvent(e), handleBackspaceEvent(e))();
+	const handleKeyDown = async (e: KeyboardEvent) => {
+		if (e.key === 'Enter' && value.trim().length > 0) {
+			updateItemForm.requestSubmit()
+			addItemForm.requestSubmit()
+		} else if (e.key === 'Backspace' && value === '') {
+			deleteItemForm.requestSubmit()
+		} else if (value.trim().length > 0) {
+			debouncedUpdate()
+		}
+	}
 </script>
 
 <div class="flex items-center">

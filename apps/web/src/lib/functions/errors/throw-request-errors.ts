@@ -10,6 +10,8 @@ export const throwRequestErrors = (e: unknown) => {
 	if (e instanceof ClientResponseError) {
 		throw error(e.status, e.message)
 	} else {
+		console.error('Encountered an unknown error:')
+		console.error(e)
 		throw e
 	}
 }
