@@ -1,0 +1,26 @@
+FROM node:20-alpine as build
+
+WORKDIR /home/my-app
+
+COPY package.json ./
+COPY --from=monorepo package-lock.json ./
+COPY --from=monorepo apps/ ./apps/
+COPY --from=monorepo packages/ ./packages/
+
+RUN npm ci
+
+COPY . .
+
+RUN npm run build
+
+FROM node:20-alpine
+
+WORKDIR /opt/my-app
+
+COPY --from=build /home/my-app/build ./build
+COPY --from=build /home/my-app/package.json ./
+COPY --from=build /home/my-app/node_modules/ ./node_modules
+
+EXPOSE 3000
+
+ENTRYPOINT ["node", "build"]

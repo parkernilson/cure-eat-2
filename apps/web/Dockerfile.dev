@@ -1,0 +1,14 @@
+FROM node:20-alpine
+
+WORKDIR /home/cureeat/apps/web
+
+COPY package.json .
+COPY --from=monorepo package.json package-lock.json /home/cureeat/
+COPY --from=monorepo apps/ /home/cureeat/apps/
+COPY --from=monorepo packages/ /home/cureeat/packages/
+
+RUN npm ci
+
+EXPOSE 5173
+
+ENTRYPOINT ["npm", "run", "dev"]

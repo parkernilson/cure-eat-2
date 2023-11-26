@@ -5,15 +5,14 @@ services:
       context: ./apps/pocketbase
       args: 
         - VERSION=0.19.4
-    container_name: cure-eat-pocketbase-dev
+    container_name: cureeat-pocketbase
     restart: unless-stopped
-    command: --debug
     ports:
       - "8090:8090"
     volumes:
-      - ./pb_data:/pb_data
-      - ./pb_migrations:/pb_migrations
-      - ./pb_hooks:/pb_hooks
+      - ./apps/pocketbase/pb_data:/pb_data
+      - ./apps/pocketbase/pb_migrations:/pb_migrations
+      - ./apps/pocketbase/pb_hooks:/pb_hooks
     healthcheck: #optional (recommended) since v0.10.0
       test: wget --no-verbose --tries=1 --spider http://localhost:8090/api/health || exit 1
       interval: 5s
@@ -22,8 +21,10 @@ services:
   webapp:
     build:
       context: ./apps/web
-      dockerfile: Dockerfile.dev
-    container_name: cure-eat-webapp-dev
+      dockerfile: Dockerfile
+      additional_contexts:
+        monorepo: ./
+    container_name: cureeat-web
     restart: unless-stopped
     ports:
       - "3000:3000"
