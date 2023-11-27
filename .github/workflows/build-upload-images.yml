@@ -1,0 +1,63 @@
+name: Build and Upload Images
+
+on:
+  workflow_dispatch: {}
+
+env:
+  AWS_ACCOUNT_ID: 445044180652
+  AWS_REGION: us-west-1
+  S3BUCKET: cureeat-deploy-bucket
+
+jobs:
+  build:
+    name: Build and Package
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v2
+        name: Checkout Repository
+
+      - name: Configure AWS Credentials for ECR
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.ECR_IAM_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build Images with Docker Compose
+        run: |
+          docker compose build
+          docker compose push
+
+      - name: Configure AWS Credentials for S3
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.CODE_DEPLOY_IAM_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Upload Docker Compose Config to s3
+        run: |
+          aws s3 cp docker-compose.yml s3://${{ env.S3BUCKET }}
+                  
+  # deploy:
+  #   name: Deploy to AWS
+  #   needs: build
+  #   runs-on: ubuntu-latest
+  #   permissions:
+  #     id-token: write
+  #     contents: read
+  #   steps:
+  #   - uses: actions/checkout@v2
+  #   - uses: aws-actions/configure-aws-credentials@v4
+  #     with:
+  #       role-to-assume: ${{ secrets.CODE_DEPLOY_IAM_ROLE_ARN }}
+  #       aws-region: ${{ env.AWS_REGION }}
+  #   - run: |
+  #       echo "Deploying branch ${{ github.ref }}"
+  #       commit_hash=`git rev-parse HEAD`
+  #       aws deploy create-deployment --application-name CureeatApplication --deployment-group-name CureeatDeploymentGroup --github-location repository=$GITHUB_REPOSITORY,commitId=$commit_hash --ignore-application-stop-failures

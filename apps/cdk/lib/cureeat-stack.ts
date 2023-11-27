@@ -6,6 +6,7 @@ import * as codedeploy from "aws-cdk-lib/aws-codedeploy";
 import { Construct } from "constructs";
 
 const GITHUB_REPO_NAME = "parkernilson/cure-eat-2"
+const IMAGE_REPOS = ["cureeat-webapp", "cureeat-pocketbase"]
 
 export class CureeatStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
@@ -90,19 +91,19 @@ export class CureeatStack extends Stack {
       clientIds: ["sts.amazonaws.com"],
     });
 
-    const githubIamRole = new iam.Role(this, "GithubIamRole", {
+    const githubCodeDeployIamRole = new iam.Role(this, "GithubCodeDeployIamRole", {
       path: "/",
-      roleName: "CodeDeployRoleForGithub",
+      roleName: "GithubCodeDeployIamRole",
       assumedBy: new iam.OpenIdConnectPrincipal(oidcProvider, {
         "StringLike": {
           "token.actions.githubusercontent.com:sub": `repo:${GITHUB_REPO_NAME}:*`
         }
       }),
       maxSessionDuration: Duration.hours(12),
-      description: "IAM role for CodeDeploy to access Github",
+      description: "IAM role for Github to access CodeDeploy",
     });
 
-    githubIamRole.addToPolicy(new iam.PolicyStatement({
+    githubCodeDeployIamRole.addToPolicy(new iam.PolicyStatement({
       effect: iam.Effect.ALLOW,
       actions: [
         "codedeploy:Get*",
@@ -114,7 +115,7 @@ export class CureeatStack extends Stack {
       resources: [`arn:${Aws.PARTITION}:codedeploy:*:${Aws.ACCOUNT_ID}:*`]
     }))
 
-    githubIamRole.addToPolicy(new iam.PolicyStatement({
+    githubCodeDeployIamRole.addToPolicy(new iam.PolicyStatement({
       effect: iam.Effect.ALLOW,
       actions: [
         "s3:GetObject",
@@ -123,12 +124,46 @@ export class CureeatStack extends Stack {
       resources: [webappDeploymentBucket.bucketArn + "/*"],
     })) 
 
-    githubIamRole.addToPolicy(new iam.PolicyStatement({
+    githubCodeDeployIamRole.addToPolicy(new iam.PolicyStatement({
       effect: iam.Effect.ALLOW,
       actions: [
         "s3:ListBucket",
       ],
       resources: [webappDeploymentBucket.bucketArn],
+    }))
+
+    const githubEcrIamRole = new iam.Role(this, "GithubEcrIamRole", {
+      path: "/",
+      roleName: "GithubEcrIamRole",
+      assumedBy: new iam.OpenIdConnectPrincipal(oidcProvider, {
+        "StringLike": {
+          "token.actions.githubusercontent.com:sub": `repo:${GITHUB_REPO_NAME}:*`
+        }
+      }),
+      maxSessionDuration: Duration.hours(12),
+      description: "IAM role for Github to access ECR",
+    })
+
+    githubEcrIamRole.addToPolicy(new iam.PolicyStatement({
+      effect: iam.Effect.ALLOW,
+      actions: [
+        "ecr:GetAuthorizationToken",
+      ],
+      resources: ["*"]
+    }))
+
+    githubEcrIamRole.addToPolicy(new iam.PolicyStatement({
+      effect: iam.Effect.ALLOW,
+      actions: [
+        "ecr:BatchGetImage",
+        "ecr:BatchCheckLayerAvailability",
+        "ecr:CompleteLayerUpload",
+        "ecr:GetDownloadUrlForLayer",
+        "ecr:InitiateLayerUpload",
+        "ecr:PutImage",
+        "ecr:UploadLayerPart"
+      ],
+      resources: IMAGE_REPOS.map(repo => `arn:${Aws.PARTITION}:ecr:${Aws.REGION}:${Aws.ACCOUNT_ID}:repository/${repo}`)
     }))
 
     const cureeatApplication = new codedeploy.ServerApplication(this, "CureeatApplication", {
