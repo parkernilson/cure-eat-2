@@ -30,6 +30,11 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v2
 
       - name: Build Images with Docker Compose
+        env:
+          PB_ADMIN_EMAIL: ${{ secrets.PB_ADMIN_EMAIL }}
+          PB_ADMIN_PASSWORD: ${{ secrets.PB_ADMIN_PASSWORD }}
+          KROGER_SECRET: ${{ secrets.KROGER_SECRET }}
+          PUBLIC_KROGER_CLIENT_ID: ${{ vars.PUBLIC_KROGER_CLIENT_ID }}
         run: |
           docker compose build
           docker compose push
