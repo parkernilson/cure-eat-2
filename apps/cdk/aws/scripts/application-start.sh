@@ -2,4 +2,4 @@
 set -xe
 
 # Start the application server.
-/usr/bin/pm2 start /home/ec2-user/ecosystem.config.js
+/usr/local/bin/docker-compose up -d /home/ec2-user/docker-compose.yml

@@ -1,4 +1,4 @@
 #!/bin/bash
 set -x
 
-/usr/bin/pm2 stop /home/ec2-user/ecosystem.config.js
+/usr/local/bin/docker-compose down /home/ec2-user/docker-compose.yml
