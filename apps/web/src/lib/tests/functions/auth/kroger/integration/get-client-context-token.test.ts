@@ -1,4 +1,4 @@
-import { PB_ADMIN_EMAIL, PB_ADMIN_PASSWORD, PB_TEST_URL, PB_TEST_PORT } from '$env/static/private';
+import { PB_ADMIN_EMAIL, PB_ADMIN_PASSWORD } from '$env/static/private';
 import { KROGER_ACCESS_TOKEN_ENDPOINT } from '$lib/constants/apis/kroger';
 import { getClientContextToken } from '$lib/functions/auth/kroger';
 import { establishConnection } from '$lib/functions/utils/pocketbase';
@@ -19,7 +19,8 @@ describe('get-client-context-token integration', async () => {
 
 		execSync('npm run start:pb-test');
 
-		adminClient = new PocketBase(`${PB_TEST_URL}:${PB_TEST_PORT}`);
+		// TODO: these integration tests need to be updated to work in containers
+		adminClient = new PocketBase(`<url here>`);
 
 		await establishConnection(adminClient);
 		await adminClient.admins.authWithPassword(PB_ADMIN_EMAIL, PB_ADMIN_PASSWORD);

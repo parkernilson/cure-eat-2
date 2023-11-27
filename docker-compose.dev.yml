@@ -26,6 +26,11 @@ services:
       dockerfile: Dockerfile.dev
       additional_contexts:
         monorepo: ./
+    environment:
+      - PB_ADMIN_EMAIL=${PB_ADMIN_EMAIL}
+      - PB_ADMIN_PASSWORD=${PB_ADMIN_PASSWORD}
+      - KROGER_SECRET=${KROGER_SECRET}
+      - PUBLIC_KROGER_CLIENT_ID=${PUBLIC_KROGER_CLIENT_ID}
     image: cureeat-web-dev
     volumes:
       - type: bind

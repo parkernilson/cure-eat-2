@@ -5,8 +5,8 @@ import { pipe } from 'fp-ts/lib/function';
 import type Client from 'pocketbase';
 import { ClientResponseError } from 'pocketbase';
 
-import { KROGER_SECRET } from '$env/static/private';
-import { PUBLIC_KROGER_CLIENT_ID } from '$env/static/public';
+import { env as env_secret } from '$env/dynamic/private';
+import { env as env_public } from '$env/dynamic/public';
 import { MILLISECONDS_PER_SECONDS } from '$lib/constants/misc/time';
 import { responseToJson } from '$lib/functions/utils/fetch';
 import { isExpiredNow } from '$lib/functions/utils/tokens';
@@ -73,7 +73,7 @@ const saveClientAccessToken = (adminClient: Client) => (token: AccessToken) =>
 
 const renewClientAccessToken = (adminClient: Client) =>
 	pipe(
-		requestClientAccessToken(PUBLIC_KROGER_CLIENT_ID, KROGER_SECRET),
+		requestClientAccessToken(env_public.PUBLIC_KROGER_CLIENT_ID, env_secret.KROGER_SECRET),
 		TE.map(
 			(data) =>
 				<AccessToken>{

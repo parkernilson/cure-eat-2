@@ -2,3 +2,5 @@
 .gitignore
 Dockerfile
 Dockerfile.*
+**/.env
+**/*.env

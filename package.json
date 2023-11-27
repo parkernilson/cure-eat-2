@@ -3,11 +3,12 @@
 	"version": "0.0.1",
 	"private": true,
 	"scripts": {
-		"dev": "docker compose -f docker-compose.dev.yml up",
-		"dev:build": "docker compose -f docker-compose.dev.yml up --build",
+		"dev:build": "docker compose --env-file ./apps/web/.env -f docker-compose.dev.yml build",
+		"dev:up": "docker compose --env-file ./apps/web/.env -f docker-compose.dev.yml up",
 		"dev:down": "docker compose -f docker-compose.dev.yml down",
-		"prod": "docker compose -f docker-compose.yml up",
-		"prod:build": "docker compose -f docker-compose.yml up --build"
+		"prod:build": "docker compose -f docker-compose.yml build",
+		"prod:up": "docker compose -f docker-compose.yml up",
+		"prod:down": "docker compose -f docker-compose.yml down"
 	},
 	"workspaces": [
 		"apps/*",

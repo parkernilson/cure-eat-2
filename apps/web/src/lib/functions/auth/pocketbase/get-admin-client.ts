@@ -1,4 +1,4 @@
-import { PB_ADMIN_EMAIL, PB_ADMIN_PASSWORD } from '$env/static/private';
+import { env } from '$env/dynamic/private';
 import { toError } from 'fp-ts/lib/Either';
 import * as TE from 'fp-ts/lib/TaskEither';
 import * as B from 'fp-ts/lib/boolean'
@@ -18,7 +18,7 @@ export const getAdminClient = () => pipe(
 	B.fold(
 		() => TE.tryCatch(async () => {
 			adminClient = new PocketBase('http://127.0.0.1:8090');
-			await adminClient.admins.authWithPassword(PB_ADMIN_EMAIL, PB_ADMIN_PASSWORD);
+			await adminClient.admins.authWithPassword(env.PB_ADMIN_EMAIL, env.PB_ADMIN_PASSWORD);
 			return adminClient;
 		}, toError),
 		() => TE.of(adminClient)
