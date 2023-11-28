@@ -102,9 +102,9 @@ export class CureeatStack extends Stack {
         ec2.InstanceSize.MICRO
       ),
       securityGroup: cureeatSecurityGroup,
-      // machineImage: ec2.MachineImage.latestAmazonLinux2023()
+      // machineImage: ec2.MachineImage.latestAmazonLinux2023(),
       machineImage: ec2.MachineImage.lookup({
-        name: "AmazonLinux2023-Node-PM2-Caddy",
+        name: "CureeatServerImage",
       }),
       role: webappRole
     });
