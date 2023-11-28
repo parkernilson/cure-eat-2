@@ -1,7 +1,6 @@
 FROM node:20-alpine as build
 
-ARG ORIGIN
-ENV ORIGIN=${ORIGIN}
+ENV ORIGIN=https://cureeat.com
 
 ARG PB_ADMIN_EMAIL
 ARG PB_ADMIN_PASSWORD
@@ -32,6 +31,8 @@ WORKDIR /opt/my-app
 COPY --from=build /home/my-app/build ./build
 COPY --from=build /home/my-app/package.json ./
 COPY --from=build /home/my-app/node_modules/ ./node_modules
+
+ENV ORIGIN=https://cureeat.com
 
 EXPOSE 3000
 

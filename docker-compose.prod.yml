@@ -24,7 +24,6 @@ services:
       additional_contexts:
         monorepo: ./
       args:
-        - ORIGIN=https://cureeat.com
         - PB_ADMIN_EMAIL=${PB_ADMIN_EMAIL}
         - PB_ADMIN_PASSWORD=${PB_ADMIN_PASSWORD}
         - KROGER_SECRET=${KROGER_SECRET}
