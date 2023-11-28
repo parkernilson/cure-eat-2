@@ -1,4 +1,4 @@
-name: Build and Upload Images
+name: Build and Deploy Images
 
 on:
   workflow_dispatch: {}
