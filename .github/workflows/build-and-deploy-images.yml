@@ -2,6 +2,9 @@ name: Build and Deploy Images
 
 on:
   workflow_dispatch: {}
+  push:
+    branches:
+      - master
 
 env:
   AWS_ACCOUNT_ID: 445044180652

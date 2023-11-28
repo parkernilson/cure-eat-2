@@ -28,6 +28,8 @@ services:
         - PB_ADMIN_PASSWORD=${PB_ADMIN_PASSWORD}
         - KROGER_SECRET=${KROGER_SECRET}
         - PUBLIC_KROGER_CLIENT_ID=${PUBLIC_KROGER_CLIENT_ID}
+    environment:
+      - ORIGIN=https://cureeat.com
     image: 445044180652.dkr.ecr.us-west-1.amazonaws.com/cureeat-webapp
     container_name: cureeat-webapp
     restart: unless-stopped
