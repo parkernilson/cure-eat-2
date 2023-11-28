@@ -14,7 +14,8 @@ RUN wget https://github.com/pocketbase/pocketbase/releases/download/v${VERSION}/
 FROM alpine:3
 RUN apk update && apk add ca-certificates && rm -rf /var/cache/apk/*
 
-COPY ./pb_hooks/ ./pb_migrations/ /srv/pocketbase/
+COPY ./pb_hooks/ /srv/pocketbase/pb_hooks
+COPY ./pb_migrations/ /srv/pocketbase/pb_migrations
 
 EXPOSE 8090
 
