@@ -5,22 +5,22 @@ files:
     destination: /usr/local/codedeployresources
 hooks:
   ApplicationStop:
-    - location: apps/cdk/aws/scripts/application-stop.sh
+    - location: /codedeploy/scripts/application-stop.sh
       timeout: 300
       runas: root
   BeforeInstall:
-    - location: apps/cdk/aws/scripts/before-install.sh
+    - location: /codedeploy/scripts/before-install.sh
       timeout: 300
       runas: root
   AfterInstall:
-    - location: apps/cdk/aws/scripts/after-install.sh
+    - location: /codedeploy/scripts/after-install.sh
       timeout: 300
       runas: root
   ApplicationStart:
-    - location: apps/cdk/aws/scripts/application-start.sh
+    - location: /codedeploy/scripts/application-start.sh
       timeout: 300
       runas: root
   ValidateService:
-    - location: apps/cdk/aws/scripts/validate-service.sh
+    - location: /codedeploy/scripts/validate-service.sh
       timeout: 300
       runas: root
