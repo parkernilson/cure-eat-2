@@ -36,8 +36,8 @@ jobs:
           KROGER_SECRET: ${{ secrets.KROGER_SECRET }}
           PUBLIC_KROGER_CLIENT_ID: ${{ vars.PUBLIC_KROGER_CLIENT_ID }}
         run: |
-          docker compose build
-          docker compose push
+          docker compose -f docker-compose.prod.yml build
+          docker compose -f docker-compose.prod.yml push
 
       - name: Configure AWS Credentials for S3
         uses: aws-actions/configure-aws-credentials@v4
