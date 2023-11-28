@@ -57,7 +57,31 @@ export class CureeatStack extends Stack {
               resources: [webappDeploymentBucket.bucketArn],
             })
           ],
-        })
+        }),
+        "allow-ecr-access-policy": new iam.PolicyDocument({
+          statements: [
+            new iam.PolicyStatement({
+              effect: iam.Effect.ALLOW,
+              actions: [
+                "ecr:GetAuthorizationToken",
+              ],
+              resources: ["*"]
+            }),
+            new iam.PolicyStatement({
+              effect: iam.Effect.ALLOW,
+              actions: [
+                "ecr:BatchCheckLayerAvailability",
+                "ecr:GetDownloadUrlForLayer",
+                "ecr:GetRepositoryPolicy",
+                "ecr:DescribeRepositories",
+                "ecr:ListImages",
+                "ecr:DescribeImages",
+                "ecr:BatchGetImage"
+              ],
+              resources: IMAGE_REPOS.map(repo => `arn:${Aws.PARTITION}:ecr:${Aws.REGION}:${Aws.ACCOUNT_ID}:repository/${repo}`)
+            })
+          ],
+        }),
       }
     })
 

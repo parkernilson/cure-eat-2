@@ -47,7 +47,7 @@ jobs:
 
       - name: Upload Docker Compose Config to s3
         run: |
-          aws s3 cp docker-compose.yml s3://${{ env.S3BUCKET }}
+          aws s3 cp docker-compose.prod.yml s3://${{ env.S3BUCKET }}/docker-compose.yml
                   
   deploy:
     name: Deploy to AWS
