@@ -20,4 +20,4 @@ COPY ./pb_migrations/ /srv/pocketbase/pb_migrations
 EXPOSE 8090
 
 COPY --from=downloader /pocketbase /usr/local/bin/pocketbase
-ENTRYPOINT ["/usr/local/bin/pocketbase", "serve", "--http=0.0.0.0:8090", "--dir=/srv/pocketbase/pb_data", "--publicDir=/srv/pocketbase/pb_public"]
+ENTRYPOINT ["/usr/local/bin/pocketbase", "serve", "--http=0.0.0.0:8090", "--dir=/srv/pocketbase-data/pb_data", "--hooksDir=/srv/pocketbase/pb_hooks", "--migrationsDir=/srv/pocketbase/pb_migrations"]
