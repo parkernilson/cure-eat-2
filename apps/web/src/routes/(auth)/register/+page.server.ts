@@ -19,8 +19,8 @@ export const actions = {
 				(formData.get('password') ?? "") as string,
 			),
 			TE.map(authResponse => authResponse.record),
-			TE.getOrElse(throwRequestErrors),
-			T.map(() => { throw redirect(302, '/login') })
-		))
+		)),
+		TE.getOrElse(throwRequestErrors),
+		T.map(() => { throw redirect(302, '/login') })
 	)(),
 };

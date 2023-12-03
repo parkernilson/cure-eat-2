@@ -17,7 +17,7 @@ export const getAdminClient = () => pipe(
 	!!adminClient,
 	B.fold(
 		() => TE.tryCatch(async () => {
-			adminClient = new PocketBase('http://127.0.0.1:8090');
+			adminClient = new PocketBase('http://pocketbase:8090');
 			await adminClient.admins.authWithPassword(env.PB_ADMIN_EMAIL, env.PB_ADMIN_PASSWORD);
 			return adminClient;
 		}, toError),
