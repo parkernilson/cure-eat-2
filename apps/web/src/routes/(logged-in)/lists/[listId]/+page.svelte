@@ -1,22 +1,12 @@
 <script lang="ts">
-	import { invalidateAll } from '$app/navigation';
 	import ListItem from '$lib/components/lists/ListItem.svelte';
-	import * as TE from 'fp-ts/lib/TaskEither';
-	import * as B from 'fp-ts/lib/boolean';
 	import type { ListItemRecord } from '$lib/interfaces/lists';
-	import { pipe } from 'fp-ts/lib/function.js';
-	import type { SubmitFunction } from './$types.js';
-	import { toError } from 'fp-ts/lib/Either.js';
-	import type { ActionResult } from '@sveltejs/kit';
-	import { performIO } from '$lib/functions/utils/fp/io.js';
-	import type { ListItem as ListItemType } from '$lib/interfaces/lists';
-	import type { RecordModel } from 'pocketbase';
 
 	export let data;
 
 	const listItemInputs: HTMLInputElement[] = [];
 	const focusItemAt = (index: number) =>
-		index < listItemInputs.length ? listItemInputs[index].focus() : undefined;
+		index < listItemInputs.length && index >= 0 ? listItemInputs[index].focus() : undefined;
 
 	const sortByOrdinal = (a: ListItemRecord, b: ListItemRecord) => a.ordinal - b.ordinal;
 </script>

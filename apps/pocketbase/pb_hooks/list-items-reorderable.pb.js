@@ -29,7 +29,7 @@ onModelAfterDelete((e) => {
 
         for (let item of listItemsAfter) {
             item.set('ordinal', item.get('ordinal') - 1)
-            txDao.saveRecord(item)
+            txDao.withoutHooks().saveRecord(item)
         }
     }))
 

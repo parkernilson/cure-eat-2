@@ -22,6 +22,7 @@
 			updateItemForm.requestSubmit();
 			addItemForm.requestSubmit();
 		} else if (e.key === 'Backspace' && value === '') {
+			console.log('requesting delete with itemId: ', item.id)
 			deleteItemForm.requestSubmit();
 		} else if (value.trim().length > 0) {
 			debouncedUpdate();
@@ -69,6 +70,14 @@
 	<input name="itemId" value={item.id} type="hidden" />
 </form>
 
-<form use:enhance bind:this={deleteItemForm} class="hidden" method="post" action="?/deleteItem">
+<form use:enhance={() => {
+	return async ({ result, update }) => {
+		await update({ reset: false, invalidateAll: true });
+		await tick();
+		if (result.type === 'success') {
+			focusItemAt(index - 1);
+		}
+	};
+}} bind:this={deleteItemForm} class="hidden" method="post" action="?/deleteItem">
 	<input name="itemId" type="hidden" value={item.id} />
 </form>
