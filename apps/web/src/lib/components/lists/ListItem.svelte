@@ -1,21 +1,15 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
-	import { invalidateAll } from '$app/navigation';
-	import { doNothing, performIO } from '$lib/functions/utils/fp/io';
 	import type { ListItemRecord } from '$lib/interfaces/lists';
-	import type { SubmitFunction } from '../../../../.svelte-kit/types/src/routes/(logged-in)/lists/[listId]/$types';
-	import { sequenceT } from 'fp-ts/lib/Apply';
-	import * as IO from 'fp-ts/lib/IO';
-	import * as B from 'fp-ts/lib/boolean';
-	import { pipe } from 'fp-ts/lib/function';
 	import { debounce } from 'lodash-es';
+	import { tick } from 'svelte';
 
 	export let item: ListItemRecord;
+	export let index: number;
+	export let focusItemAt: (index: number) => void;
 
 	let value: string = item.value;
 	export let valueInput: HTMLInputElement;
-
-    export let addItemSubmit: SubmitFunction
 
 	let deleteItemForm: HTMLFormElement;
 	let addItemForm: HTMLFormElement;
@@ -25,32 +19,52 @@
 
 	const handleKeyDown = async (e: KeyboardEvent) => {
 		if (e.key === 'Enter' && value.trim().length > 0) {
-			updateItemForm.requestSubmit()
-			addItemForm.requestSubmit()
+			updateItemForm.requestSubmit();
+			addItemForm.requestSubmit();
 		} else if (e.key === 'Backspace' && value === '') {
-			deleteItemForm.requestSubmit()
+			deleteItemForm.requestSubmit();
 		} else if (value.trim().length > 0) {
-			debouncedUpdate()
+			debouncedUpdate();
 		}
-	}
+	};
 </script>
 
 <div class="flex items-center">
 	<i class="{item.checked ? 'fa-solid fa-circle-check' : 'fa-regular fa-circle'} mr-3" />
 	<input bind:this={valueInput} class="flex-1 m-3" bind:value on:keydown={handleKeyDown} />
 	<p class="mr-3">|</p>
-	<form method="post" action="?/searchProduct" use:enhance>
+	<form method="post" action="?/searchProduct" use:enhance={() => () => {}}>
 		<input class="hidden" name="searchTerm" type="text" value={item.value} />
 		<button type="submit">Search</button>
 	</form>
 </div>
 
-<form use:enhance={addItemSubmit} bind:this={addItemForm} class="hidden" method="post" action="?/addItem">
-	<input name="value" type="hidden" value={''} />
+<form
+	use:enhance={() => {
+		return async ({ result, update }) => {
+			await update({ reset: false, invalidateAll: true });
+			await tick();
+			if (result.type === 'success') {
+				focusItemAt(index + 1);
+			}
+		};
+	}}
+	bind:this={addItemForm}
+	class="hidden"
+	method="post"
+	action="?/addItem"
+>
+	<input name="newValue" type="hidden" value={''} />
 	<input name="ordinal" type="hidden" value={item.ordinal + 1} />
 </form>
 
-<form use:enhance={() => () => {}} bind:this={updateItemForm} class="hidden" method="post" action="?/updateItem">
+<form
+	use:enhance={() => () => {}}
+	bind:this={updateItemForm}
+	class="hidden"
+	method="post"
+	action="?/updateItem"
+>
 	<input name="value" {value} type="hidden" />
 	<input name="itemId" value={item.id} type="hidden" />
 </form>

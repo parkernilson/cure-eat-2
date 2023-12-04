@@ -38,7 +38,7 @@ export const actions = {
 			getFormData(request),
 			TE.flatMap(formData => pipe(
 				sequenceS(E.Applicative)({
-					value: getStringWithKey(formData)('value'),
+					value: getStringWithKey(formData)('newValue'),
 					ordinal: pipe(getStringWithKey(formData)('ordinal'), E.map(Number)),
 				}),
 				TE.fromEither,

@@ -9,21 +9,16 @@
 	import { toError } from 'fp-ts/lib/Either.js';
 	import type { ActionResult } from '@sveltejs/kit';
 	import { performIO } from '$lib/functions/utils/fp/io.js';
+	import type { ListItem as ListItemType } from '$lib/interfaces/lists';
+	import type { RecordModel } from 'pocketbase';
 
 	export let data;
 
 	const listItemInputs: HTMLInputElement[] = [];
+	const focusItemAt = (index: number) =>
+		index < listItemInputs.length ? listItemInputs[index].focus() : undefined;
 
 	const sortByOrdinal = (a: ListItemRecord, b: ListItemRecord) => a.ordinal - b.ordinal;
-
-	const addItemSubmit: SubmitFunction = ({}) => async ({ result }) => {
-		await invalidateAll()
-		if (result.type === 'success' && result.data?.formId === 'addItem') {
-			const { ordinal } = result.data.listItemRecord
-			listItemInputs[ordinal]?.focus()
-		}
-	}
-
 </script>
 
 <div class="flex items-center mt-8">
@@ -40,7 +35,7 @@
 {/if}
 
 {#each data.list.items.sort(sortByOrdinal) as item, i (item.id)}
-	<ListItem bind:valueInput={listItemInputs[i]} {item} {addItemSubmit} />
+	<ListItem bind:valueInput={listItemInputs[i]} index={i} {item} {focusItemAt} />
 
 	{#if i < data.list.items.length - 1}
 		<hr />
