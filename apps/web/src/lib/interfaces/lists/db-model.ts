@@ -23,6 +23,8 @@ export type List = {
 	title: string;
 	color: SupportedColor;
 	owner: string;
+	location_id: string;
+	location_name: string;
 };
 export type ListItem = {
 	value: string;

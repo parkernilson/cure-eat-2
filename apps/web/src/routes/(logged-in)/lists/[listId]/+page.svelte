@@ -1,5 +1,6 @@
 <script lang="ts">
 	import ListItem from '$lib/components/lists/ListItem.svelte';
+	import LocationPicker from '$lib/components/locations/LocationPicker.svelte';
 	import type { ListItemRecord } from '$lib/interfaces/lists';
 
 	export let data;
@@ -14,6 +15,7 @@
 <div class="flex items-center mt-8">
 	<h1 class="font-display text-4xl text-slate-600">{data.list.title}</h1>
 </div>
+<LocationPicker list={data.list} />
 <hr class="mb-8" />
 
 {#if data.list.items.length === 0}
