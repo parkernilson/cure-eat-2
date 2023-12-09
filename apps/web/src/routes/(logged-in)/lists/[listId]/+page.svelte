@@ -27,7 +27,7 @@
 {/if}
 
 {#each data.list.items.sort(sortByOrdinal) as item, i (item.id)}
-	<ListItem bind:valueInput={listItemInputs[i]} index={i} {item} {focusItemAt} />
+	<ListItem bind:valueInput={listItemInputs[i]} index={i} {item} list={data.list} {focusItemAt} />
 
 	{#if i < data.list.items.length - 1}
 		<hr />

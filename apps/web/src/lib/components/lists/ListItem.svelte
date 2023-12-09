@@ -1,9 +1,10 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
-	import type { ListItemRecord } from '$lib/interfaces/lists';
+	import type { ListItemRecord, ListRecord } from '$lib/interfaces/lists';
 	import { debounce } from 'lodash-es';
 	import { tick } from 'svelte';
 
+	export let list: ListRecord;
 	export let item: ListItemRecord;
 	export let index: number;
 	export let focusItemAt: (index: number) => void;
@@ -36,6 +37,7 @@
 	<p class="mr-3">|</p>
 	<form method="post" action="?/searchProduct" use:enhance={() => () => {}}>
 		<input class="hidden" name="searchTerm" type="text" value={item.value} />
+		<input class="hidden" name="locationId" type="text" value={list.location_id} />
 		<button type="submit">Search</button>
 	</form>
 </div>

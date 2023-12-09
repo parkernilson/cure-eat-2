@@ -76,7 +76,11 @@ export const actions = {
 			sequenceT(TE.ApplicativePar)(getAdminClient(), getFormData(request)),
 			TE.flatMap(([adminClient, formData]) =>
 				pipe(
-					TE.fromEither(getStringWithKey(formData)('searchTerm')),
+					sequenceS(E.Applicative)({
+						locationId: getStringWithKey(formData)('locationId'),
+						searchTerm: getStringWithKey(formData)('searchTerm')
+					}),
+					TE.fromEither,
 					TE.flatMap(searchKrogerProduct(adminClient))
 				)
 			),
@@ -110,6 +114,6 @@ export const actions = {
 			),
 			TE.flatMap(setLocation(locals.pb)(params.listId)),
 			TE.getOrElse(throwRequestErrors),
-			T.map(updatedListRecord => ({ updatedListRecord, formId: 'setLocation' as const }))
+			T.map((updatedListRecord) => ({ updatedListRecord, formId: 'setLocation' as const }))
 		)()
 };

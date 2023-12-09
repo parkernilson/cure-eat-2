@@ -7,13 +7,18 @@ import * as TE from 'fp-ts/lib/TaskEither';
 import { pipe } from 'fp-ts/lib/function';
 import type Client from 'pocketbase';
 
-export const searchKrogerProduct = (adminClient: Client) => (searchTerm: string) =>
+interface SearchKrogerProductParams {
+	searchTerm: string;
+	locationId: string;
+}
+
+export const searchKrogerProduct = (adminClient: Client) => ({ searchTerm, locationId }: SearchKrogerProductParams) =>
 	pipe(
 		getClientContextToken(adminClient),
 		TE.flatMap((token) =>
 			TE.tryCatch(
 				() =>
-					fetch(`${KROGER_PRODUCT_SEARCH_ENDPOINT}?filter.term=${searchTerm}`, {
+					fetch(`${KROGER_PRODUCT_SEARCH_ENDPOINT}?filter.term=${searchTerm}&filter.location=${locationId}`, {
 						method: 'GET',
 						headers: {
 							Accepts: 'application/json',
