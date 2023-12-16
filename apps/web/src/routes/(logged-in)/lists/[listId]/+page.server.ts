@@ -149,5 +149,5 @@ export const actions = {
 			TE.flatMap(setLocation(locals.pb)(params.listId)),
 			TE.getOrElse(throwRequestErrors),
 			T.map((updatedListRecord) => ({ updatedListRecord, formId: 'setLocation' as const }))
-		)()
+		)(),
 };

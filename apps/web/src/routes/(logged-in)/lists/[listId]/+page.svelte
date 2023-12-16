@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { enhance } from '$app/forms';
 	import ListItem from '$lib/components/lists/ListItem.svelte';
 	import LocationPicker from '$lib/components/locations/LocationPicker.svelte';
 	import type { ListItemRecord } from '$lib/interfaces/lists';

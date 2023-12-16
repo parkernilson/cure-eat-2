@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import type { ListItemRecord, ListRecord } from '$lib/interfaces/lists';
-	import { debounce } from 'lodash-es';
+	import { debounce, update } from 'lodash-es';
 	import { tick } from 'svelte';
 	import type { SubmitFunction } from '../../../routes/(logged-in)/lists/[listId]/$types';
 	import type { ProductModel } from '$lib/interfaces/products/kroger/product-search-api';
@@ -48,6 +48,16 @@
 			debouncedUpdate();
 		}
 	};
+
+	const updateItemHandler: SubmitFunction = () => ({result}) => {
+		if (result.type === 'success' && result.data?.formId === 'updateItem') {
+			// This may not be the best way of handling this, as it could cause the data to get
+			// out of sync with other references to this list item. However, it's the only
+			// way I could find to prevent the input from losing focus when the value is updated.
+			item.value = result.data.listItemRecord.value
+		}
+	}
+
 </script>
 
 <div class="flex items-center">
@@ -108,7 +118,7 @@
 </form>
 
 <form
-	use:enhance={() => () => {}}
+	use:enhance={updateItemHandler}
 	bind:this={updateItemForm}
 	class="hidden"
 	method="post"

@@ -11,7 +11,6 @@
     export let item: ListItemRecord;
 
     $: defaultImage = getDefaultImageSize(product.images);
-    $: console.log(defaultImage)
     $: defaultImageUrl = defaultImage._tag === "Some" ? defaultImage.value.url : null;
 
     let setProductForm: HTMLFormElement;
