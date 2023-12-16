@@ -5,6 +5,7 @@ import {
 	addItemToListCurried,
 	deleteListItem,
 	getListWithItemsCurried,
+	setProduct,
 	updateItem
 } from '$lib/functions/lists/db-accessors';
 import { searchKrogerProduct } from '$lib/functions/products/kroger/search-product.js';
@@ -86,6 +87,39 @@ export const actions = {
 			),
 			TE.getOrElse(throwRequestErrors),
 			T.map((product) => ({ product, formId: 'searchProduct' as const }))
+		)(),
+	setProduct: async ({ request, locals }) =>
+		pipe(
+			getFormData(request),
+			TE.flatMapEither((formData) =>
+				sequenceS(E.Applicative)({
+					name: getStringWithKey(formData)('name'),
+					price: getStringWithKey(formData)('price'),
+					location_id: getStringWithKey(formData)('location_id'),
+					external_id: getStringWithKey(formData)('external_id'),
+					list: getStringWithKey(formData)('list'),
+					thumbnail_url: getStringWithKey(formData)('thumbnail_url'),
+					item_id: getStringWithKey(formData)('item_id')
+				})
+			),
+			TE.flatMap(({item_id, ...product}) => setProduct(locals.pb)(item_id)(product)),
+			TE.getOrElse(throwRequestErrors),
+			T.map((productModel) => ({ product: productModel, formId: 'setProduct' as const }))
+		)(),
+	setSearchTerm: async ({ request, locals }) =>
+		pipe(
+			getFormData(request),
+			TE.flatMapEither((formData) =>
+				sequenceS(E.Applicative)({
+					searchTerm: getStringWithKey(formData)('searchTerm'),
+					itemId: getStringWithKey(formData)('itemId')
+				})
+			),
+			TE.flatMap(({ searchTerm, itemId }) =>
+				updateItem(locals.pb)(itemId)({ search_term: searchTerm })
+			),
+			TE.getOrElse(throwRequestErrors),
+			T.map((listItem) => ({ listItem, formId: 'setSearchTerm' as const }))
 		)(),
 	queryLocations: async ({ request }) =>
 		pipe(

@@ -3,6 +3,10 @@
 	import type { ListItemRecord, ListRecord } from '$lib/interfaces/lists';
 	import { debounce } from 'lodash-es';
 	import { tick } from 'svelte';
+	import type { SubmitFunction } from '../../../routes/(logged-in)/lists/[listId]/$types';
+	import type { ProductModel } from '$lib/interfaces/products/kroger/product-search-api';
+	import Modal from '$lib/components/ui/Modal.svelte';
+	import ProductOption from '../products/ProductOption.svelte';
 
 	export let list: ListRecord;
 	export let item: ListItemRecord;
@@ -12,9 +16,25 @@
 	let value: string = item.value;
 	export let valueInput: HTMLInputElement;
 
+	let productOptions: ProductModel[];
+	let showProductOptionsModal: boolean = false;
+
+	let thumbnailUrl = item.product?.thumbnail_url ?? 'default url'; // TODO: add a default thumbnail for products
+
 	let deleteItemForm: HTMLFormElement;
 	let addItemForm: HTMLFormElement;
 	let updateItemForm: HTMLFormElement;
+
+	const searchProductHandler: SubmitFunction = () => {
+		return async ({ result }) => {
+			if (result.type === 'success') {
+				if (result.data?.formId === 'searchProduct') {
+					productOptions = result.data.product.data;
+					showProductOptionsModal = true;
+				}
+			}
+		};
+	};
 
 	const debouncedUpdate = debounce(() => updateItemForm?.requestSubmit(), 1000);
 
@@ -23,7 +43,6 @@
 			updateItemForm.requestSubmit();
 			addItemForm.requestSubmit();
 		} else if (e.key === 'Backspace' && value === '') {
-			console.log('requesting delete with itemId: ', item.id)
 			deleteItemForm.requestSubmit();
 		} else if (value.trim().length > 0) {
 			debouncedUpdate();
@@ -35,12 +54,39 @@
 	<i class="{item.checked ? 'fa-solid fa-circle-check' : 'fa-regular fa-circle'} mr-3" />
 	<input bind:this={valueInput} class="flex-1 m-3" bind:value on:keydown={handleKeyDown} />
 	<p class="mr-3">|</p>
-	<form method="post" action="?/searchProduct" use:enhance={() => () => {}}>
-		<input class="hidden" name="searchTerm" type="text" value={item.value} />
+	<form method="post" action="?/searchProduct" use:enhance={searchProductHandler}>
+		<input
+			class="hidden"
+			name="searchTerm"
+			type="text"
+			value={item.search_term?.length && item.search_term.length > 0
+				? item.search_term
+				: item.value}
+		/>
 		<input class="hidden" name="locationId" type="text" value={list.location_id} />
-		<button type="submit">Search</button>
+		{#if item.product}
+			<button type="submit" class="w-10 h-10 bg-contain bg-center" style="
+				background-image: url({item.product.thumbnail_url});
+			"></button>
+		{:else}
+			<button type="submit">Search</button>
+		{/if}
 	</form>
 </div>
+
+<Modal bind:showModal={showProductOptionsModal}>
+	<h1>Product Options</h1>
+	<form method="post" use:enhance={searchProductHandler} action="?/searchProduct">
+		<input type="text" name="searchTerm" placeholder="Search term" />
+		<input class="hidden" name="locationId" type="text" value={list.location_id} />
+		<button>Search</button>
+	</form>
+	{#if productOptions?.length > 0}
+		{#each productOptions as product}
+			<ProductOption {product} {list} {item} />
+		{/each}
+	{/if}
+</Modal>
 
 <form
 	use:enhance={() => {
@@ -72,14 +118,20 @@
 	<input name="itemId" value={item.id} type="hidden" />
 </form>
 
-<form use:enhance={() => {
-	return async ({ result, update }) => {
-		await update({ reset: false, invalidateAll: true });
-		await tick();
-		if (result.type === 'success') {
-			focusItemAt(index - 1);
-		}
-	};
-}} bind:this={deleteItemForm} class="hidden" method="post" action="?/deleteItem">
+<form
+	use:enhance={() => {
+		return async ({ result, update }) => {
+			await update({ reset: false, invalidateAll: true });
+			await tick();
+			if (result.type === 'success') {
+				focusItemAt(index - 1);
+			}
+		};
+	}}
+	bind:this={deleteItemForm}
+	class="hidden"
+	method="post"
+	action="?/deleteItem"
+>
 	<input name="itemId" type="hidden" value={item.id} />
 </form>

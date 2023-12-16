@@ -10,7 +10,7 @@ interface ProductItemModel {
         instore: boolean
         shiptohome: boolean
     }
-    price: {
+    price?: {
         regular: number
         promo: number
         regularPerUnitEstimate: number
@@ -37,7 +37,18 @@ interface AisleLocation {
     shelfPositionInBay: string
 }
 
-interface ProductModel {
+export interface KrogerProductImage {
+    id: string
+    perspective: string
+    featured: boolean
+    sizes: {
+        id: string
+        size: string
+        url: string
+    }[]
+}
+
+export interface ProductModel {
     productId: string
     aisleLocations: AisleLocation[]
     brand: string
@@ -54,16 +65,7 @@ interface ProductModel {
         indicator: string
         heatSensitive: boolean
     }
-    images: {
-        id: string
-        perspective: string
-        default: boolean
-        sizes: {
-            id: string
-            size: string
-            url: string
-        }[]
-    }[]
+    images: KrogerProductImage[]
     upc: string
 }
 

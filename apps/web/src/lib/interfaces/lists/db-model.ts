@@ -1,4 +1,5 @@
 import type { RecordModel } from 'pocketbase';
+import type { ProductRecord } from '../products';
 
 export type SupportedColor =
 	| 'red'
@@ -31,6 +32,8 @@ export type ListItem = {
 	list: string;
 	ordinal: number;
 	checked: boolean;
+	product?: ProductRecord;
+	search_term?: string;
 };
 
 export type ListRecord = List & RecordModel;
@@ -38,3 +41,6 @@ export type ListRecord = List & RecordModel;
 export type ListItemRecord = ListItem & RecordModel;
 
 export type ListWithItemsRecord = ListRecord & { items: ListItemRecord[] };
+
+export type ListItemExpanded = ListItemRecord & { expand?: { product?: ProductRecord } }
+export type ListExpanded = ListWithItemsRecord & { expand?: { 'list_items(list)'?: ListItemExpanded[] } }

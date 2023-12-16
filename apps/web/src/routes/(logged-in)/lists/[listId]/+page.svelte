@@ -21,7 +21,7 @@
 {#if data.list.items.length === 0}
 	<form method="post" action="?/addItem">
 		<input name="ordinal" value={0} type="hidden" />
-		<input name="value" value={''} type="hidden" />
+		<input name="newValue" value={''} type="hidden" />
 		<button>Tap to create your first item</button>
 	</form>
 {/if}

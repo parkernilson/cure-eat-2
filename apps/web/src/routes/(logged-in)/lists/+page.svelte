@@ -2,12 +2,10 @@
 	import ListOfListsItem from '$lib/components/lists/ListOfListsItem.svelte';
 	import ListColorRadio from '$lib/components/ui/ListColorRadio.svelte';
 	import Modal from '$lib/components/ui/Modal.svelte';
-	import { LIST_COLORS } from '$lib/constants/ui';
 
 	export let data;
 
 	let showCreateListModal = false;
-	let showDeleteListModal = false;
 </script>
 
 <div class="flex items-center justify-between mt-8">
