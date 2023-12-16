@@ -5,13 +5,12 @@
 	import { enhance } from "$app/forms";
 	import type { ListItemRecord, ListRecord } from "$lib/interfaces/lists";
 	import { getDefaultImageSize } from "$lib/functions/utils/kroger/images";
-    import * as O from 'fp-ts/lib/Option'
 
     export let product: ProductModel;
     export let list: ListRecord;
     export let item: ListItemRecord;
 
-    let defaultImage = getDefaultImageSize(product.images);
+    $: defaultImage = getDefaultImageSize(product.images);
     $: console.log(defaultImage)
     $: defaultImageUrl = defaultImage._tag === "Some" ? defaultImage.value.url : null;
 
