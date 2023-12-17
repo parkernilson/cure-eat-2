@@ -18,6 +18,7 @@
 
 	let productOptions: ProductModel[];
 	let showProductOptionsModal: boolean = false;
+	let editingValue: boolean = false;
 
 	let thumbnailUrl = item.product?.thumbnail_url ?? 'default url'; // TODO: add a default thumbnail for products
 
@@ -49,20 +50,20 @@
 		}
 	};
 
-	const updateItemHandler: SubmitFunction = () => ({result}) => {
-		if (result.type === 'success' && result.data?.formId === 'updateItem') {
-			// This may not be the best way of handling this, as it could cause the data to get
-			// out of sync with other references to this list item. However, it's the only
-			// way I could find to prevent the input from losing focus when the value is updated.
-			item.value = result.data.listItemRecord.value
-		}
-	}
-
 </script>
 
 <div class="flex items-center">
 	<i class="{item.checked ? 'fa-solid fa-circle-check' : 'fa-regular fa-circle'} mr-3" />
-	<input bind:this={valueInput} class="flex-1 m-3" bind:value on:keydown={handleKeyDown} />
+	<!-- svelte-ignore a11y-autofocus -->
+	<input 
+		bind:this={valueInput} 
+		class="flex-1 m-3" 
+		bind:value 
+		on:keydown={handleKeyDown} 
+		on:focusin={() => editingValue = true}
+		on:focusout={() => editingValue = false}
+		autofocus={editingValue}
+	/>
 	<p class="mr-3">|</p>
 	<form method="post" action="?/searchProduct" use:enhance={searchProductHandler}>
 		<input
@@ -75,7 +76,7 @@
 		/>
 		<input class="hidden" name="locationId" type="text" value={list.location_id} />
 		{#if item.product}
-			<button type="submit" class="w-10 h-10 bg-contain bg-center" style="
+			<button type="submit" class="w-10 h-10 bg-contain bg-center bg-no-repeat" style="
 				background-image: url({item.product.thumbnail_url});
 			"></button>
 		{:else}
@@ -118,7 +119,7 @@
 </form>
 
 <form
-	use:enhance={updateItemHandler}
+	use:enhance
 	bind:this={updateItemForm}
 	class="hidden"
 	method="post"
