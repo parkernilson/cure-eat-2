@@ -2,19 +2,19 @@ import * as TE from 'fp-ts/lib/TaskEither';
 import * as E from 'fp-ts/lib/Either';
 import { sequenceS, sequenceT } from 'fp-ts/lib/Apply';
 import { pipe } from 'fp-ts/lib/function';
-import { createList, deleteList, getAllListsWithItems } from '$lib/functions/lists/db-accessors.js';
+import { createList, deleteList, getAllLists } from '$lib/functions/lists/db-accessors.js';
 import { throwRequestErrors } from '$lib/functions/errors/throw-request-errors.js';
 import { getFormData, getStringWithKey } from '$lib/functions/utils/fp';
-import { isSupportedColor } from '$lib/interfaces/lists/db-model.js';
+import { isListRaw, isSupportedColor, type ListRaw } from '$lib/interfaces/lists';
 
 export const load = ({ locals }) =>
 	pipe(
-		getAllListsWithItems(locals.pb),
+		getAllLists(locals.pb),
 		TE.map((lists) => ({ lists, user: locals.pb.authStore.model })),
 		TE.getOrElse(throwRequestErrors)
 	)();
 
-const getListFromFormData = (formData: FormData) =>
+const getListFromFormData = (owner: string) => (formData: FormData): TE.TaskEither<Error, ListRaw> =>
 	pipe(
 		sequenceS(E.Applicative)({
 			title: pipe(
@@ -34,9 +34,20 @@ const getListFromFormData = (formData: FormData) =>
 						(wrongColor) => new Error(`Invalid color: ${wrongColor}`)
 					)
 				)
+			),
+			owner: E.right(owner),
+			location_id: pipe(
+				getStringWithKey(formData)('location_id'),
+				E.altW(() => E.right(undefined))
+			),
+			location_name: pipe(
+				getStringWithKey(formData)('location_name'),
+				E.altW(() => E.right(undefined))
 			)
-		})
-	);
+		}),
+		TE.fromEither,
+		TE.flatMap(TE.fromPredicate(isListRaw, () => new Error('Invalid list data')))
+	)
 
 export const actions = {
 	createList: ({ request, locals }) =>
@@ -47,8 +58,8 @@ export const actions = {
 			),
 			TE.flatMap(([formData, userModel]) =>
 				pipe(
-					TE.fromEither(getListFromFormData(formData)),
-					TE.flatMap(createList(locals.pb)(userModel.id))
+					getListFromFormData(userModel.id)(formData),
+					TE.flatMap(createList(locals.pb))
 				)
 			),
 			TE.getOrElse(throwRequestErrors)

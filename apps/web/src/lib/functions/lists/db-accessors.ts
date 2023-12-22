@@ -1,47 +1,60 @@
 import type {
-	List,
 	ListExpanded,
 	ListItem,
+	ListItemExpanded,
+	ListItemRaw,
 	ListItemRecord,
-	ListRecord,
-	ListWithItemsRecord
+	ListRaw,
+	ListRawRecord,
+	ListRecord
 } from '$lib/interfaces/lists';
 import type { Product } from '$lib/interfaces/products';
+import { sequenceT } from 'fp-ts/lib/Apply';
 import { toError } from 'fp-ts/lib/Either';
 import * as TE from 'fp-ts/lib/TaskEither';
 import * as B from 'fp-ts/lib/boolean';
 import { pipe } from 'fp-ts/lib/function';
 import type Client from 'pocketbase';
 import { createProduct, deleteProduct } from '../products';
-import { sequenceT } from 'fp-ts/lib/Apply';
 
-export const getList = (pb: Client, listId: string) =>
-	TE.tryCatch(() => pb.collection('lists').getOne<ListRecord>(listId), toError);
+const unpackExpandedListItem = ({
+	expand: expandListItem,
+	...item
+}: ListItemExpanded): ListItemRecord => ({
+	...item,
+	product: expandListItem?.product ?? undefined
+});
 
-export const getListItems = (pb: Client, listId: string) =>
-	TE.tryCatch(
-		() => pb.collection('list_items').getFullList<ListItemRecord>({ filter: `list = '${listId}'` }),
-		toError
+export const getListItems = (pb: Client) => (listId: string) =>
+	pipe(
+		TE.tryCatch(
+			() =>
+				pb
+					.collection('list_items')
+					.getFullList<ListItemExpanded>({ filter: `list = '${listId}'`, expand: 'product' }),
+			toError
+		),
+		TE.map((items) => items.map(unpackExpandedListItem))
 	);
 
 export const getListItem = (pb: Client) => (itemId: string) =>
-	TE.tryCatch(() => pb.collection('list_items').getOne<ListItemRecord>(itemId), toError);
+	pipe(
+		TE.tryCatch(
+			() => pb.collection('list_items').getOne<ListItemExpanded>(itemId, { expand: 'product' }),
+			toError
+		),
+		TE.map(unpackExpandedListItem)
+	);
 
-const unpackExpandedList = ({
-	expand: expandList,
-	...list
-}: ListExpanded): ListWithItemsRecord => ({
+const unpackExpandedList = ({ expand: expandList, ...list }: ListExpanded): ListRecord => ({
 	...list,
 	items:
 		expandList && expandList['list_items(list)']
-			? expandList['list_items(list)'].map(({ expand: expandListItem, ...item }) => ({
-					...item,
-					product: expandListItem?.product ?? undefined
-			  }))
+			? expandList['list_items(list)'].map(unpackExpandedListItem)
 			: []
 });
 
-export const getListWithItems = (pb: Client, listId: string) =>
+export const getList = (pb: Client) => (listId: string) =>
 	pipe(
 		TE.tryCatch(
 			() =>
@@ -56,14 +69,14 @@ export const getListWithItems = (pb: Client, listId: string) =>
  * @param pb
  * @returns
  */
-export const getAllLists = (pb: Client) =>
-	TE.tryCatch(() => pb.collection('lists').getFullList<ListRecord>(), toError);
+export const getAllListsWithoutItems = (pb: Client) =>
+	TE.tryCatch(() => pb.collection('lists').getFullList<ListRawRecord>(), toError);
 
-export const getAllListsWithItems = (pb: Client) =>
+export const getAllLists = (pb: Client) =>
 	pipe(
 		TE.tryCatch(
 			() =>
-				pb.collection('lists').getFullList<ListWithItemsRecord>({
+				pb.collection('lists').getFullList<ListRecord>({
 					expand: 'list_items(list).product'
 				}),
 			toError
@@ -71,13 +84,13 @@ export const getAllListsWithItems = (pb: Client) =>
 		TE.map((lists) => lists.map(unpackExpandedList))
 	);
 
-export const createList = (pb: Client) => (owner: string) => (list: Omit<List, 'owner'>) =>
-	TE.tryCatch(() => pb.collection('lists').create<ListRecord>({ ...list, owner }), toError);
+export const createList = (pb: Client) => (list: ListRaw) =>
+	TE.tryCatch(() => pb.collection('lists').create<ListRecord>(list), toError);
 
 export const deleteList = (pb: Client) => (listId: string) =>
 	TE.tryCatch(() => pb.collection('lists').delete(listId), toError);
 
-export const addItemToList = (pb: Client, listId: string, item: ListItem) =>
+export const addItemToList = (pb: Client) => (listId: string) => (item: ListItem) =>
 	pipe(
 		listId === item.list,
 		B.fold(
@@ -86,37 +99,40 @@ export const addItemToList = (pb: Client, listId: string, item: ListItem) =>
 		)
 	);
 
-export const updateItem = (pb: Client) => (itemId: string) => (item: Partial<ListItem>) =>
+export const updateItem = (pb: Client) => (itemId: string) => (item: Partial<ListItemRaw>) =>
 	TE.tryCatch(() => pb.collection('list_items').update<ListItemRecord>(itemId, item), toError);
 
 export const deleteListItem = (pb: Client) => (itemId: string) =>
 	TE.tryCatch(() => pb.collection('list_items').delete(itemId), toError);
-
-const updateListItemProduct = (pb: Client) => (itemId: string) => (productId: string) =>
-	TE.tryCatch(() => pb.collection('list_items').update<ListItemRecord>(itemId, { product: productId }), toError);
 
 export const setProduct = (pb: Client) => (itemId: string) => (product: Product) =>
 	pipe(
 		sequenceT(TE.ApplicativePar)(createProduct(pb)(product), getListItem(pb)(itemId)),
 		TE.flatMap(([productModel, listItem]) =>
 			pipe(
-				updateListItemProduct(pb)(listItem.id)(productModel.id),
-				TE.flatMap(() => B.fold(
-					() => TE.of(false),
-					() => deleteProduct(pb)(listItem.product!)
-				)(!!listItem.product))
+				updateItem(pb)(listItem.id)({ product: productModel.id }),
+				TE.flatMap(() =>
+					B.fold(
+						() => TE.of(false),
+						() => deleteProduct(pb)(listItem.product!)
+					)(!!listItem.product)
+				)
 			)
 		)
 	);
 
-///////////////// Curried functions /////////////////////
-
-export const getListCurried = (pb: Client) => (listId: string) => getList(pb, listId);
-
-export const getListItemsCurried = (pb: Client) => (listId: string) => getListItems(pb, listId);
-
-export const getListWithItemsCurried = (pb: Client) => (listId: string) =>
-	getListWithItems(pb, listId);
-
-export const addItemToListCurried = (pb: Client) => (listId: string) => (item: ListItem) =>
-	addItemToList(pb, listId, item);
+export const removeProduct = (pb: Client) => (itemId: string) =>
+	pipe(
+		getListItem(pb)(itemId),
+		TE.map((listItem) => listItem.product?.id),
+		TE.flatMap(TE.fromNullable('no-product' as const)),
+		TE.flatMap((productId) =>
+			sequenceT(TE.ApplicativeSeq)(
+				updateItem(pb)(itemId)({ product: "" }),
+				deleteProduct(pb)(productId)
+			)
+		),
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+		TE.map(([_, success]) => success),
+		TE.orElse((e) => (e === 'no-product' ? TE.of(true) : TE.left(e)))
+	);

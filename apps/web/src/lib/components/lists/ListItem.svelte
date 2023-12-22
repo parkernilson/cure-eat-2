@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import Modal from '$lib/components/ui/Modal.svelte';
 	import type { ListItemRecord, ListRecord } from '$lib/interfaces/lists';
-	import { debounce, update } from 'lodash-es';
+	import type { ProductModel } from '$lib/interfaces/products/kroger/product-search-api';
+	import { debounce } from 'lodash-es';
 	import { tick } from 'svelte';
 	import type { SubmitFunction } from '../../../routes/(logged-in)/lists/[listId]/$types';
-	import type { ProductModel } from '$lib/interfaces/products/kroger/product-search-api';
-	import Modal from '$lib/components/ui/Modal.svelte';
 	import ProductOption from '../products/ProductOption.svelte';
 
 	export let list: ListRecord;
@@ -86,6 +86,10 @@
 </div>
 
 <Modal bind:showModal={showProductOptionsModal}>
+	<form method="post" use:enhance action="?/removeProduct">
+		<input hidden name="itemId" value={item.id} />
+		<button type="submit">Remove product</button>
+	</form>	
 	<h1>Product Options</h1>
 	<form method="post" use:enhance={searchProductHandler} action="?/searchProduct">
 		<input type="text" name="searchTerm" placeholder="Search term" />

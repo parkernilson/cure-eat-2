@@ -2,9 +2,10 @@ import { getAdminClient } from '$lib/functions/auth/pocketbase';
 import { throwRequestErrors } from '$lib/functions/errors/throw-request-errors.js';
 import { createDefaultListItemObject } from '$lib/functions/lists';
 import {
-	addItemToListCurried,
+	addItemToList,
 	deleteListItem,
-	getListWithItemsCurried,
+	getList,
+	removeProduct,
 	setProduct,
 	updateItem
 } from '$lib/functions/lists/db-accessors';
@@ -20,8 +21,7 @@ import { setLocation } from '$lib/functions/store-locations/db-accessors';
 
 export const load = ({ locals, params }) =>
 	pipe(
-		params.listId,
-		getListWithItemsCurried(locals.pb),
+		getList(locals.pb)(params.listId),
 		TE.map((list) => ({ list })),
 		TE.getOrElse(throwRequestErrors)
 	)();
@@ -30,45 +30,35 @@ export const actions = {
 	updateItem: async ({ locals, request }) =>
 		pipe(
 			getFormData(request),
-			TE.flatMap((formData) =>
-				pipe(
-					sequenceS(E.Applicative)({
-						value: getStringWithKey(formData)('value'),
-						itemId: getStringWithKey(formData)('itemId')
-					}),
-					TE.fromEither,
-					TE.flatMap(({ itemId, ...listItem }) => updateItem(locals.pb)(itemId)(listItem))
-				)
+			TE.flatMapEither((formData) =>
+				sequenceS(E.Applicative)({
+					value: getStringWithKey(formData)('value'),
+					itemId: getStringWithKey(formData)('itemId')
+				})
 			),
+			TE.flatMap(({ itemId, ...listItem }) => updateItem(locals.pb)(itemId)(listItem)),
 			TE.getOrElse(throwRequestErrors),
 			T.map((listItemRecord) => ({ listItemRecord, formId: 'updateItem' as const }))
 		)(),
 	addItem: async ({ locals, params, request }) =>
 		pipe(
 			getFormData(request),
-			TE.flatMap((formData) =>
-				pipe(
-					sequenceS(E.Applicative)({
-						value: getStringWithKey(formData)('newValue'),
-						ordinal: pipe(getStringWithKey(formData)('ordinal'), E.map(Number))
-					}),
-					TE.fromEither,
-					TE.map(createDefaultListItemObject(params.listId)),
-					TE.flatMap(addItemToListCurried(locals.pb)(params.listId))
-				)
+			TE.flatMapEither((formData) =>
+				sequenceS(E.Applicative)({
+					value: getStringWithKey(formData)('newValue'),
+					ordinal: pipe(getStringWithKey(formData)('ordinal'), E.map(Number))
+				}),
 			),
+			TE.map(createDefaultListItemObject(params.listId)),
+			TE.flatMap(addItemToList(locals.pb)(params.listId)),
 			TE.getOrElse(throwRequestErrors),
 			T.map((listItemRecord) => ({ listItemRecord, formId: 'addItem' as const }))
 		)(),
 	deleteItem: async ({ locals, request }) =>
 		pipe(
 			getFormData(request),
-			TE.flatMap((formData) =>
-				pipe(
-					TE.fromEither(getStringWithKey(formData)('itemId')),
-					TE.flatMap(deleteListItem(locals.pb))
-				)
-			),
+			TE.flatMapEither((formData) => getStringWithKey(formData)('itemId')),
+			TE.flatMap(deleteListItem(locals.pb)),
 			TE.getOrElse(throwRequestErrors),
 			T.map((success) => ({ success, formId: 'deleteItem' as const }))
 		)(),
@@ -105,6 +95,14 @@ export const actions = {
 			TE.flatMap(({item_id, ...product}) => setProduct(locals.pb)(item_id)(product)),
 			TE.getOrElse(throwRequestErrors),
 			T.map((productModel) => ({ product: productModel, formId: 'setProduct' as const }))
+		)(),
+	removeProduct: async ({ request, locals }) =>
+		pipe(
+			getFormData(request),
+			TE.flatMapEither(formData => getStringWithKey(formData)('itemId')),
+			TE.flatMap(removeProduct(locals.pb)),
+			TE.getOrElse(throwRequestErrors),
+			T.map((success) => ({ success, formId: 'removeProduct' as const }))
 		)(),
 	setSearchTerm: async ({ request, locals }) =>
 		pipe(

@@ -1,46 +1,40 @@
 import type { RecordModel } from 'pocketbase';
 import type { ProductRecord } from '../products';
+import type { SupportedColor } from './colors';
 
-export type SupportedColor =
-	| 'red'
-	| 'blue'
-	| 'green'
-	| 'yellow'
-	| 'purple'
-	| 'pink'
-	| 'orange'
-	| 'gray';
-export const isSupportedColor = (color: string): color is SupportedColor =>
-	color === 'red' ||
-	color === 'blue' ||
-	color === 'green' ||
-	color === 'yellow' ||
-	color === 'purple' ||
-	color === 'pink' ||
-	color === 'orange' ||
-	color === 'gray';
-
-export type List = {
+export type ListRaw = {
 	title: string;
 	color: SupportedColor;
 	owner: string;
-	location_id: string;
-	location_name: string;
+	location_id?: string;
+	location_name?: string;
 };
-export type ListItem = {
+
+export const isListRaw = (obj: { [key: string]: unknown }): obj is ListRaw => {
+	return (
+		typeof obj.title === 'string' &&
+		typeof obj.color === 'string' &&
+		typeof obj.owner === 'string' &&
+		typeof obj.location_id === 'string' || obj.location_id === undefined &&
+		typeof obj.location_name === 'string' || obj.location_name === undefined
+	);
+}
+
+export type ListItemRaw = {
 	value: string;
 	list: string;
 	ordinal: number;
 	checked: boolean;
-	product?: ProductRecord;
+	product?: string;
 	search_term?: string;
 };
 
-export type ListRecord = List & RecordModel;
-
+export type ListItem = Omit<ListItemRaw, 'product'> & { product?: ProductRecord }
 export type ListItemRecord = ListItem & RecordModel;
+export type ListItemRawRecord = ListItemRaw & RecordModel;
 
-export type ListWithItemsRecord = ListRecord & { items: ListItemRecord[] };
+export type ListRecord = ListRaw & RecordModel & { items: ListItemRecord[] };
+export type ListRawRecord = ListRaw & RecordModel;
 
-export type ListItemExpanded = ListItemRecord & { expand?: { product?: ProductRecord } }
-export type ListExpanded = ListWithItemsRecord & { expand?: { 'list_items(list)'?: ListItemExpanded[] } }
+export type ListItemExpanded = ListItemRawRecord & { expand?: { product?: ProductRecord } }
+export type ListExpanded = ListRawRecord & { expand?: { 'list_items(list)'?: ListItemExpanded[] } }
