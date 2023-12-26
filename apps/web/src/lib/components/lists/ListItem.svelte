@@ -10,6 +10,7 @@
 
 	export let list: ListRecord;
 	export let item: ListItemRecord;
+
 	export let index: number;
 	export let focusItemAt: (index: number) => void;
 
@@ -53,7 +54,14 @@
 </script>
 
 <div class="flex items-center">
-	<i class="{item.checked ? 'fa-solid fa-circle-check' : 'fa-regular fa-circle'} mr-3" />
+	<form method="post" action="?/toggleCheckItem" use:enhance={() => async ({ update }) => {
+		await update({ reset: false })
+	}}>
+		<input hidden name="itemId" value={item.id} />
+		<button type="submit">
+			<i class="{item.checked ? 'fa-solid fa-circle-check' : 'fa-regular fa-circle'} mr-3" />
+		</button>
+	</form>
 	<!-- svelte-ignore a11y-autofocus -->
 	<input 
 		bind:this={valueInput} 

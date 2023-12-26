@@ -11,6 +11,9 @@
 		index < listItemInputs.length && index >= 0 ? listItemInputs[index].focus() : undefined;
 
 	const sortByOrdinal = (a: ListItemRecord, b: ListItemRecord) => a.ordinal - b.ordinal;
+
+	$: sortedListItems = data.list.items.sort(sortByOrdinal)
+
 </script>
 
 <div class="flex items-center mt-8">
@@ -27,7 +30,7 @@
 	</form>
 {/if}
 
-{#each data.list.items.sort(sortByOrdinal) as item, i (item.id)}
+{#each sortedListItems as item, i (item.id)}
 	<ListItem bind:valueInput={listItemInputs[i]} index={i} {item} list={data.list} {focusItemAt} />
 
 	{#if i < data.list.items.length - 1}

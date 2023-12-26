@@ -39,10 +39,15 @@ export const getListItems = (pb: Client) => (listId: string) =>
 
 export const getListItem = (pb: Client) => (itemId: string) =>
 	pipe(
-		TE.tryCatch(
+		itemId,
+		TE.fromPredicate(
+			(id) => id.length > 0, 
+			() => new Error("A list item id is required for this operation")
+		),
+		TE.flatMap(() => TE.tryCatch(
 			() => pb.collection('list_items').getOne<ListItemExpanded>(itemId, { expand: 'product' }),
 			toError
-		),
+		)),
 		TE.map(unpackExpandedListItem)
 	);
 

@@ -5,6 +5,7 @@ import {
 	addItemToList,
 	deleteListItem,
 	getList,
+	getListItem,
 	removeProduct,
 	setProduct,
 	updateItem
@@ -148,4 +149,13 @@ export const actions = {
 			TE.getOrElse(throwRequestErrors),
 			T.map((updatedListRecord) => ({ updatedListRecord, formId: 'setLocation' as const }))
 		)(),
+	toggleCheckItem: async ({ request, locals }) =>
+		pipe(
+			getFormData(request),
+			TE.flatMapEither(formData => getStringWithKey(formData)('itemId')),
+			TE.flatMap(getListItem(locals.pb)),
+			TE.flatMap(item => updateItem(locals.pb)(item.id)({ checked: !item.checked })),
+			TE.getOrElse(throwRequestErrors),
+			T.map(listItem => ({ listItem, formId: 'toggleCheckItem' as const }))
+		)()
 };
