@@ -17,7 +17,7 @@
 
 	const selectProductHandler: SubmitFunction = () => {
 		return async ({ update }) => {
-            await update({ invalidateAll: true })
+            await update({ reset: false, invalidateAll: true })
 		}
 	}
 
